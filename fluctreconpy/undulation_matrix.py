@@ -64,36 +64,31 @@ def undulation_matrix(spatial_pos=None,
 
 
             undulation[j,i,j,i-1]  =(z[j+1]-z[j-1])/3.*(1./(r[i-1]-r[i])) + \
-                (r[i]-r[i-1])  /6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                    (r[i]-r[i-1])  /6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
 
             undulation[j,i,j,i]    =(z[j+1]-z[j-1])/3.*(1./(r[i]-r[i-1])+1./(r[i+1]-r[i])) + \
-                    (r[i+1]-r[i-1])/3.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                    (r[i+1]-r[i-1])/3.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
 
             undulation[j,i,j,i+1]  =(z[j+1]-z[j-1])/3.*(1./(r[i]-r[i+1])) + \
-                (r[i+1]-r[i])  /6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                    (r[i+1]-r[i])  /6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
 
             undulation[j,i,j-1,i-1]=(z[j]-z[j-1])  /6.*(1./(r[i-1]-r[i])) + \
-                (r[i]-r[i-1])  /6.*(1./(z[j-1]-z[j]))
+                                    (r[i]-r[i-1])  /6.*(1./(z[j-1]-z[j]))
 
             undulation[j,i,j-1,i]  =(z[j]-z[j-1])  /6.*(1./(r[i]-r[i-1])+1./(r[i+1]-r[i])) + \
-                (r[i+1]-r[i-1])/3.*(1./(z[j-1]-z[j]))
+                                    (r[i+1]-r[i-1])/3.*(1./(z[j-1]-z[j]))
 
             undulation[j,i,j-1,i+1]=(z[j]-z[j-1])  /6.*(1./(r[i]-r[i+1])) + \
-                (r[i+1]-r[i])  /6.*(1./(z[j-1]-z[j]))
+                                    (r[i+1]-r[i])  /6.*(1./(z[j-1]-z[j]))
 
             undulation[j,i,j+1,i-1]=(z[j+1]-z[j])  /6.*(1./(r[i-1]-r[i])) + \
-                (r[i]-r[i-1])  /6.*(1./(z[j]-z[j+1]))
+                                    (r[i]-r[i-1])  /6.*(1./(z[j]-z[j+1]))
 
             undulation[j,i,j+1,i]  =(z[j+1]-z[j])  /6.*(1./(r[i]-r[i-1])+1./(r[i+1]-r[i])) + \
-                (r[i+1]-r[i-1])/3.*(1./(z[j]-z[j+1]))
+                                    (r[i+1]-r[i-1])/3.*(1./(z[j]-z[j+1]))
 
             undulation[j,i,j+1,i+1]=(z[j+1]-z[j])  /6.*(1./(r[i]-r[i+1])) + \
-                (r[i+1]-r[i])  /6.*(1./(z[j]-z[j+1]))
-
-
-
-
-
+                                    (r[i+1]-r[i])  /6.*(1./(z[j]-z[j+1]))
 
     if (floating is None) :
         for i in range(0, nr):
@@ -102,99 +97,99 @@ def undulation_matrix(spatial_pos=None,
                 if j == 0 :
                     if i == 0 :
                         undulation[j,i,j,i]=    (z[j+1]-z[j])/6.*(1./(r[i+1]-r[i])) + \
-                            (r[i+1]-r[i])/6.*(1./(z[j+1]-z[j]))
+                                                (r[i+1]-r[i])/6.*(1./(z[j+1]-z[j]))
                         undulation[j,i,j,i+1]=  (z[j+1]-z[j])/6.*(1./(r[i+1]-r[i])) + \
-                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
+                                                (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
                         undulation[j,i,j+1,i]=  (z[j+1]-z[j])/6.*(1./(r[i]-r[i+1])) + \
-                                            (r[i+1]-r[i])/6.*(1./(z[j+1]-z[j]))
+                                                (r[i+1]-r[i])/6.*(1./(z[j+1]-z[j]))
                         undulation[j,i,j+1,i+1]=(z[j+1]-z[j])/6.*(1./(r[i]-r[i+1])) + \
                                                 (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
                     else:
                         if i == nr-1 :
                             undulation[j,i,j,i-1]=  (z[j+1]-z[j])/6.*(1./(r[i-1]-r[i])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j+1]-z[j]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j+1]-z[j]))
                             undulation[j,i,j,i]=    (z[j+1]-z[j])/6.*(1./(r[i]-r[i-1])) + \
-                                        (r[i]-r[i-1])/6.*(1./(z[j+1]-z[j])) #corr
+                                                    (r[i]-r[i-1])/6.*(1./(z[j+1]-z[j])) #corr
                             undulation[j,i,j+1,i-1]=(z[j+1]-z[j])/6.*(1./(r[i-1]-r[i])) + \
-                                        (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
                             undulation[j,i,j+1,i]=  (z[j+1]-z[j])/6.*(1./(r[i]-r[i-1])) + \
-                                        (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
                         else:
                             undulation[j,i,j,i-1]=  (z[j+1]-z[j])/6.*(1./(r[i-1]-r[i])) + \
-                               (r[i]-r[i-1])/6.*(1./(z[j+1]-z[j]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j+1]-z[j]))
                             undulation[j,i,j,i]=    (z[j+1]-z[j])/6.*(1./(r[i]-r[i-1])+1./(r[i+1]-r[i])) + \
-                                (r[i+1]-r[i-1])/3.*(1./(z[j+1]-z[j]))
+                                                    (r[i+1]-r[i-1])/3.*(1./(z[j+1]-z[j]))
                             undulation[j,i,j,i+1]=  (z[j+1]-z[j])/6.*(1./(r[i]-r[i+1])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j+1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j+1]-z[j]))
                             undulation[j,i,j+1,i-1]=(z[j+1]-z[j])/6.*(1./(r[i-1]-r[i])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
                             undulation[j,i,j+1,i]=  (z[j+1]-z[j])/6.*(1./(r[i]-r[i-1])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
                             undulation[j,i,j+1,i+1]=(z[j+1]-z[j])/6.*(1./(r[i]-r[i+1])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
 
 
                 else:
                     if j == nz-1 :
                         if i == 0 :
                             undulation[j,i,j-1,i]=  (z[j]-z[j-1])/6.*(1./(r[i+1]-r[i])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
                             undulation[j,i,j-1,i+1]=(z[j]-z[j-1])/6.*(1./(r[i]-r[i+1])) + \
-                                        (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
                             undulation[j,i,j,i]=    (z[j]-z[j-1])/6.*(1./(r[i+1]-r[i])) + \
-                                            (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1]))
                             undulation[j,i,j,i+1]=  (z[j]-z[j-1])/6.*(1./(r[i]-r[i+1])) + \
-                                            (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1]))
                         else:
                             if i == nr-1 :
                                 undulation[j,i,j-1,i-1]=(z[j]-z[j-1])/6.*(1./(r[i-1]-r[i])) + \
-                                            (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
+                                                        (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
                                 undulation[j,i,j-1,i]=  (z[j]-z[j-1])/6.*(1./(r[i]-r[i-1])) + \
-                                                    (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
+                                                        (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
                                 undulation[j,i,j,i-1]=  (z[j]-z[j-1])/6.*(1./(r[i-1]-r[i])) + \
-                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1]))
+                                                        (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1]))
                                 undulation[j,i,j,i]=    (z[j]-z[j-1])/6.*(1./(r[i]-r[i-1])) + \
-                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1])) #corr
+                                                        (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1])) #corr
                             else:
                                 undulation[j,i,j-1,i-1]=(z[j]-z[j-1])/6.*(1./(r[i-1]-r[i])) + \
-                                   (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
+                                                        (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
                                 undulation[j,i,j-1,i]=  (z[j]-z[j-1])  /6.*(1./(r[i]-r[i-1])+1./(r[i+1]-r[i])) + \
-                                    (r[i+1]-r[i-1])/3.*(1./(z[j-1]-z[j]))
+                                                        (r[i+1]-r[i-1])/3.*(1./(z[j-1]-z[j]))
 
                                 undulation[j,i,j-1,i+1]=(z[j]-z[j-1])  /6.*(1./(r[i]-r[i+1])) + \
-                                    (r[i+1]-r[i])  /6.*(1./(z[j-1]-z[j]))
+                                                        (r[i+1]-r[i])  /6.*(1./(z[j-1]-z[j]))
                                 undulation[j,i,j,i-1]=  (z[j]-z[j-1])/6.*(1./(r[i-1]-r[i])) + \
-                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1]))
+                                                        (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1]))
                                 undulation[j,i,j,i]=    (z[j]-z[j-1])/6.*(1./(r[i]-r[i-1])+1./(r[i+1]-r[i])) + \
-                                    (r[i+1]-r[i-1])/3.*(1./(z[j]-z[j-1])) #corr
+                                                        (r[i+1]-r[i-1])/3.*(1./(z[j]-z[j-1])) #corr
                                 undulation[j,i,j,i+1]=  (z[j]-z[j-1])/6.*(1./(r[i]-r[i+1])) + \
-                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1]))
+                                                        (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1]))
                     else:
                         if i == 0 :
                             undulation[j,i,j-1,i]=  (z[j]-z[j-1])/6.*(1./(r[i+1]-r[i])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
                             undulation[j,i,j-1,i+1]=(z[j]-z[j-1])/6.*(1./(r[i]-r[i+1])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j-1]-z[j]))
                             undulation[j,i,j,i]=    (z[j+1]-z[j-1])/3.*(1./(r[i+1]-r[i])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
                             undulation[j,i,j,i+1]=  (z[j+1]-z[j-1])/3.*(1./(r[i]-r[i+1])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
                             undulation[j,i,j+1,i]=  (z[j+1]-z[j])/6.*(1./(r[i+1]-r[i])) + \
-                                (r[i+1]-r[i])/3.*(1./(z[j]-z[j+1]))
+                                                    (r[i+1]-r[i])/3.*(1./(z[j]-z[j+1]))
                             undulation[j,i,j+1,i+1]=(z[j+1]-z[j])/6.*(1./(r[i]-r[i+1])) + \
-                                (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i+1]-r[i])/6.*(1./(z[j]-z[j+1]))
 
                         if i == nr-1 :
                             undulation[j,i,j-1,i-1]=(z[j]-z[j-1])/6.*(1./(r[i-1]-r[i])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
                             undulation[j,i,j-1,i]=  (z[j]-z[j-1])/6.*(1./(r[i]-r[i-1])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j-1]-z[j]))
                             undulation[j,i,j,i-1]=  (z[j+1]-z[j-1])/3.*(1./(r[i-1]-r[i])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
                             undulation[j,i,j,i]=    (z[j+1]-z[j-1])/3.*(1./(r[i]-r[i-1])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j-1])+1./(z[j+1]-z[j]))
                             undulation[j,i,j+1,i-1]=(z[j+1]-z[j])/6.*(1./(r[i-1]-r[i])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
                             undulation[j,i,j+1,i]=  (z[j+1]-z[j])/6.*(1./(r[i]-r[i-1])) + \
-                                (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
+                                                    (r[i]-r[i-1])/6.*(1./(z[j]-z[j+1]))
     return undulation

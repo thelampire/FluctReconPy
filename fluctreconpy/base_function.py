@@ -15,11 +15,9 @@ def base_function(r=None,
                   ):
 
     if len(r) != 3 or len(z) != 3:
-      raise ValueError('The boundary of the pyramid needs to be defined by 3-3 r z points.')
+        raise ValueError('The boundary of the pyramid needs to be defined by 3-3 r z points.')
 
-    if r_interp is None or z_interp is None:
-        raise ValueError('r_interp and z_interp need to be set.')
-
+    if r_interp is not None and z_interp is not None:
 
         r_vec=np.arange(nvec)/nvec*(r[2]-r[0])+r[0]
         z_vec=np.arange(nvec)/nvec*(z[2]-z[0])+z[0]
@@ -37,7 +35,6 @@ def base_function(r=None,
                         base[i_r,j_z]=(r_vec[i_r]-r[2])/(r[1]-r[2])*(z_vec[j_z]-z[0])/(z[1]-z[0])
                     else:
                         base[i_r,j_z]=(r_vec[i_r]-r[2])/(r[1]-r[2])*(z_vec[j_z]-z[2])/(z[1]-z[2])
-
         return base
     else:
         if r_interp < r[0] or r_interp > r[2] or z_interp < z[0] or z_interp > z[2] :

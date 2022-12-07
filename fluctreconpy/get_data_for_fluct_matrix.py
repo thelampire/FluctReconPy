@@ -1,4 +1,6 @@
-import numpy
+#TODO: rewrite this whenever the fluctuation matrix can be reconstructed with a code
+
+import numpy as np
 pro get_data_for_fluct_matrix, shot, timerange=timerange, thomson=thomson
 
 default, shot, 14110
@@ -13,28 +15,28 @@ if (thomson is None):#Thomson data is useless most of the time
         get_rawsignal, shot, '\TS_EDGE'+strtrim(index_edge[i],2)+':EDGE'+strtrim(index_edge[i],2)+'_TE', t, d, /store
         if i == 0: edge_te_profile=numpy.zeroes(len(d),n_edge)
         edge_te_profile[*,i]=d
-        
-  
+
+
         for i in range(0, n_core):
             get_rawsignal, shot,  '\TS_CORE'+strtrim(index_core[i],2)+':CORE'+strtrim(index_core[i],2)+'_TE', t, d, /store
             if i == 0: core_te_profile=numpy.zeroes(len(d),n_core)
             core_te_profile[*,i]=d
-        
-  
+
+
         #ne profile read from Thomson
-  
+
         for i in range(0, n_edge):
             get_rawsignal, shot, '\TS_EDGE'+strtrim(index_edge[i],2)+':EDGE'+strtrim(index_edge[i],2)+'_NE', t, d, /store
             if i == 0: edge_ne_profile=numpy.zeroes(len(d),n_edge)
             edge_ne_profile[*,i]=d
-        
-  
+
+
         for i in range(0, n_core):
             get_rawsignal, shot,  '\TS_CORE'+strtrim(index_core[i],2)+':CORE'+strtrim(index_core[i],2)+'_NE', t, d, /store
             if i == 0: core_ne_profile=numpy.zeroes(len(d),n_core)
             core_ne_profile[*,i]=d
-        
-  
+
+
         thomson_calibration_edge=[2169.3, 2179.6, 2189.9, 2201.0, 2208.4, 2218.9, 2227.1, 2234.6, 2245.1, 2259.5, 2270.8, 2280.7, 2292.2, 2302.9, 2313.7]
         thomson_calibration_core=[1801.0,1835.9,1865.0,1898.0,1956.7,1986.3,2016.6,2048.1,2076.7,2108.6,2138.7,2173.0]
 end
@@ -64,7 +66,7 @@ if file_test(ece_spat_file) :
     for i in range(0, len(n_ece)):
         read_kstar_mdsplus, 14110, ece_channel_names[i]+':RPOS2ND', time, data
         ece_spatial_coordinate[i]=data
-        
+
         save, ece_channel_names, ece_spatial_coordinates, filename=strtrim(shot,2)+'_ECE_channels_spatial_coord.sav'
 endelse
 

@@ -70,9 +70,6 @@ def calculate_decomposition(light_profile=None,
     ;
     """
 
-
-
-
     if not nocalc:
         if iterate:
             k_factor_vector=k_factor
@@ -151,4 +148,5 @@ def calculate_decomposition(light_profile=None,
         return -1
 
     p_vector = np.squeeze(p_vector,n_rad_calc,n_vert_calc).T
+
     return p_vector
