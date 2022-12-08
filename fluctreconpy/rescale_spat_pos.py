@@ -8,7 +8,7 @@ def rescale_spat_pos(shot=14110,
     spatial_pos_init=None #TODO: getcal_kstar_spat(shot)
     spat_pos_mid=[np.mean(spatial_pos_init[:,:,0]),
                   np.mean(spatial_pos_init[:,:,1])]
-    spatial_pos=np.zeroes(nwin,nwin,2)
+    spatial_pos=np.zeros([nwin,nwin,2])
 
 
     for i in range(0, nwin):

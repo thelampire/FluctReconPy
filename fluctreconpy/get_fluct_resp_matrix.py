@@ -1,4 +1,5 @@
 import numpy as np
+
 def get_fluct_resp_matrix(timerange=None, test=True, reform=None, spatial_pos=None):
 
 
@@ -9,8 +10,8 @@ def get_fluct_resp_matrix(timerange=None, test=True, reform=None, spatial_pos=No
         #The matrix itself is a Lower triangular matrix
         nr=len(spatial_pos[0,:,0])
         nz=len(spatial_pos[:,0,0])
-        tauvec=np.zeroes(nr,nz)
-        matrix=np.zeroes(nz,nr,nz,nr)
+        tauvec=np.zeros([nr,nz])
+        matrix=np.zeros([nz,nr,nz,nr])
         energy=90e3 #eV
         e=1.6e-19
         mh=1.6727e-27

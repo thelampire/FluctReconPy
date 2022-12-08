@@ -43,6 +43,7 @@ def undulation_matrix(spatial_pos=None,
 
     nr=len(spatial_pos[0,:,0])
     nz=len(spatial_pos[:,0,0])
+
     if (onedim is None) :
         r=(spatial_pos[nz/2-1,:,0]+spatial_pos[nz/2,:,0])/2.
         z=(spatial_pos[:,nr/2-1,1]+spatial_pos[:,nr/2,1])/2.

@@ -11,7 +11,7 @@ def test_base_function(shot, timerange=None):
 
     r_vec=(spat_cal[1,:,0]+spat_cal[2,:,0])/2
     z_vec=(spat_cal[:,7,1]+spat_cal[:,8,1])/2
-    si=np.zeroes((nz-1)*z_inter+1,(nr-1)*r_inter+1,2)
+    si=np.zeros([(nz-1)*z_inter+1,(nr-1)*r_inter+1,2])
     si[:,:,0]=np.interpolate(spat_cal[:,:,0],
                              (np.arange((nz-1)*z_inter+1))/z_inter,
                              (np.arange((nr-1)*r_inter+1))/r_inter,
@@ -24,8 +24,9 @@ def test_base_function(shot, timerange=None):
     r_vec_inter=np.interpolate(r_vec, (np.arange((nr-1)*r_inter+1))/r_inter)
     z_vec_inter=np.interpolate(z_vec, (np.arange((nz-1)*z_inter+1))/z_inter)
 
-    signal=np.zeroes(nz,nr)
-    signal_inter=np.zeroes((nz-1)*z_inter+1,(nr-1)*r_inter+1)
+    signal=np.zeros([nz,nr])
+    signal_inter=np.zeros([(nz-1)*z_inter+1,(nr-1)*r_inter+1])
+
     for i in range(0, nz):
         for j in range(0, nr):
             #get_rawsignal, shot, 'BES-'+strtrim(i+1,2)+'-'+strtrim(j+1,2), t, d, timerange=timerange, /nocalib
@@ -42,6 +43,7 @@ def test_base_function(shot, timerange=None):
             p2=(r_vec_inter[j]-r_vec[ir])  /(r_vec[ir+1]-r_vec[ir]) * (z_vec_inter[i]-z_vec[iz])/  (z_vec[iz+1]-z_vec[iz])
             p3=(r_vec_inter[j]-r_vec[ir+1])/(r_vec[ir]-r_vec[ir+1]) * (z_vec_inter[i]-z_vec[iz])/  (z_vec[iz+1]-z_vec[iz])
             p4=(r_vec_inter[j]-r_vec[ir])  /(r_vec[ir+1]-r_vec[ir]) * (z_vec_inter[i]-z_vec[iz+1])/(z_vec[iz]-z_vec[iz+1])
+
             signal_inter[i,j]=(p1 * signal[iz,  ir]+
                                p2 * signal[iz+1,ir+1]+
                                p3 * signal[iz+1,ir]+

@@ -10,8 +10,8 @@ def test_undulation(nvec=100, test=True):
 
     r_vec_interp=np.arange(nr*nvec)*rres/nvec
     z_vec_interp=np.arange(nz*nvec)*zres/nvec
-    undulation=np.zeroes(16,4,16,4)
-    diffmat=np.zeroes(nr*nvec,nz*nvec,4)
+    undulation=np.zeros([16,4,16,4])
+    diffmat=np.zeros([nr*nvec,nz*nvec,4])
     if (test) :
         for i1 in range(1, nr-2+1):
             for j1 in range(1, nz-2+1):
@@ -50,7 +50,7 @@ def base_function_diff( r, z, nvec=100, rdiff=None, zdiff=None):
     r_vec=np.arange(nvec)/nvec*(r[2]-r[0])+r[0]
     z_vec=np.arange(nvec)/nvec*(z[2]-z[0])+z[0]
 
-    base_diff=np.zeroes(nvec,nvec)
+    base_diff=np.zeros([nvec,nvec])
     for i_r in range(0, nvec):
         for j_z in range(0, nvec):
 

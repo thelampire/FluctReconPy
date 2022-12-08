@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from fluctreconpy import calculate_decomposition,reform_matrix,\
                          get_fluct_resp_matrix,get_fluct_resp_matrix,\
-                         fluctuation_matrix_test
+                         fluctuation_matrix_test, get_spatcal
 
 def test_fluct_decomp(nocalib=True,
                       k_factor=None,
@@ -33,8 +33,7 @@ def test_fluct_decomp(nocalib=True,
                       threshold=0.001,
                       ):
 
-    shot=14110
-    spatial_pos = None #TODO: getcal_kstar_spat(shot)
+    spatial_pos = get_spatcal(shot=14110, device='KSTAR', nbi=2)['spatcal']
     n_rad_meas=  len(spatial_pos[0,:,0])
     n_vert_meas= len(spatial_pos[:,0,0])
     n_rad_calc=  len(spatial_pos[0,:,0])
@@ -44,10 +43,9 @@ def test_fluct_decomp(nocalib=True,
     electronic_noise=electronic_noise/np.sqrt(20) #1Mhz bandwidth --> 50kHz bandwidth for blobs, approx. power decrease
     #Fill up of the error_vector
 
-    s_vector=np.zeroes(n_vert_meas,n_rad_meas)
-    n_vector=np.zeroes(n_vert_calc,n_rad_calc)
-    n0=1. #Characteristic density
-    error_vector=np.zeroes(n_vert_meas,n_rad_meas) #square of the standard error
+    s_vector=np.zeros([n_vert_meas,n_rad_meas])
+    n_vector=np.zeros([n_vert_calc,n_rad_calc])
+    error_vector=np.zeros([n_vert_meas,n_rad_meas]) #square of the standard error
     if (moving is not None) :
         m_matrix=get_fluct_resp_matrix(spatial_pos=spatial_pos, test=test) #[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
         m_matrix_ref = reform_matrix(m_matrix,[n_rad_calc*n_vert_calc,n_rad_meas*n_vert_meas])
@@ -63,7 +61,7 @@ def test_fluct_decomp(nocalib=True,
         s_vector_ref = np.matmul(m_matrix_ref, n_vector_ref) + (np.max(np.abs(np.matmul(m_matrix_ref, n_vector_ref)))*noise_level+electronic_noise)*np.random.rand(64) #s_vector is a simulated measurement)
         error_vector_s_ref=np.abs((np.matmul(m_matrix_ref,n_vector_ref))*noise_level+electronic_noise)**2
         s_vector=(s_vector_ref, n_vert_meas, n_rad_meas)
-        #TODO: error_vector=reform(error_vector_s_ref,n_vert_meas, n_rad_meas)
+        error_vector=np.reshape(error_vector_s_ref,(n_vert_meas, n_rad_meas))
 
         n_vector_calc=calculate_decomposition(light_profile=s_vector,
                                               error_profile=error_vector,
@@ -98,7 +96,7 @@ def test_fluct_decomp(nocalib=True,
                                          sampling_time=sampling_time,
                                          blob_density=blob_density_orig)
         n_vector_calc=n_vector
-        blob_density_samp=np.zeroes(len(time_vec))
+        blob_density_samp=np.zeros(len(time_vec))
         for i in range[len(time_vec)]:
             value=np.max(np.abs(np.matmul(m_matrix_ref, np.reshape(((n_vector[:,:,0])).T, n_rad_meas*n_vert_meas))))
             noise=(value*noise_level+electronic_noise)*np.random.rand(n_rad_meas*n_vert_meas)

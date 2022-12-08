@@ -16,7 +16,7 @@ def test_decomposition(n_noise=100.,
 
     if (test_density):
 
-        error_mat=np.zeroes(n_noise,n_error)
+        error_mat=np.zeros([n_noise,n_error])
         for i in range(0, n_noise):
             for j in range(0, n_error):
                 print( (i*n_error+j)/(n_error*n_noise))
@@ -39,7 +39,7 @@ def test_decomposition(n_noise=100.,
 
             plt.plot(noise_vec,
                      np.sum(error_mat,axis=1)/n_error)
-            error_vector=np.zeroes(n_noise)
+            error_vector=np.zeros([n_noise])
             for i in range(0,n_noise):
                 error_vector[i]=np.sqrt(np.var(error_mat[i,:]))
             plt.errorbar(noise_vec,
@@ -49,8 +49,8 @@ def test_decomposition(n_noise=100.,
 
 
     if (test_blob_position is None) :
-        position_mat=np.zeroes(n_noise,n_error,2)
-        size_mat=np.zeroes(n_noise,n_error,2)
+        position_mat=np.zeros([n_noise,n_error,2])
+        size_mat=np.zeros([n_noise,n_error,2])
         for i in range(0, n_noise):
             for j in range(0, n_error):
                 print((i*n_error+j)/(n_error*n_noise))
@@ -78,7 +78,7 @@ def test_decomposition(n_noise=100.,
 
 
             plt.plot(noise_vec,np.sum(position_mat,2)/n_error)
-            error_vector=np.zeroes(n_noise)
+            error_vector=np.zeros([n_noise])
             for i in range(n_noise):
                 error_vector[i]=np.sqrt(np.var(position_mat[i,:,0]+np.var(position_mat[i,:,1])))
             plt.errorbar(noise_vec,

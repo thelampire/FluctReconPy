@@ -1,4 +1,4 @@
-#TODO: rewrite this whenever the fluctuation matrix can be reconstructed with a code
+#TODO: rewrite this whenever the fluctuation matrix can be reconstructed with a code like RENATE
 
 import numpy as np
 pro get_data_for_fluct_matrix, shot, timerange=timerange, thomson=thomson

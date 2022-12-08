@@ -3,7 +3,7 @@ import numpy as np
 def reform_matrix(matrix, dimensions, reverse=None):
 
 #**************************************************************
-#*** reform_matrix.pro             by M. Lampert 08.31.2016 ***
+#*** reform_matrix.pro --< python  by M. Lampert 08.31.2016 ***
 #**************************************************************
 
 
@@ -41,7 +41,6 @@ def reform_matrix(matrix, dimensions, reverse=None):
         n3=dimensions[2]
         n4=dimensions[3]
 
-
         if len(dimensions) != 4:
             raise ValueError('When reverse reformation is used: the dimensions should be a two element vector.')
 
@@ -55,8 +54,5 @@ def reform_matrix(matrix, dimensions, reverse=None):
                 for k in range(0, n3):
                     for l in range(0, n4):
                         return_matrix[i,j,k,l]=matrix[i*n2+j, k*n4+l]
-
-
-
 
     return return_matrix
