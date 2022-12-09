@@ -37,28 +37,28 @@ def undulation_matrix(spatial_pos=None,
     #    radial & vertical coordinates.
     """
 
-    if r_vec is None and  z_vec is None:
-        raise ValueError('No spatial coordinates are defined. Returning...')
+    if r_vec is None and z_vec is None:
+        if spatial_pos is None:
+            raise ValueError('spatial_pos needs to be set.')
 
-
-    nr=len(spatial_pos[0,:,0])
-    nz=len(spatial_pos[:,0,0])
-
-    if (onedim is None) :
-        r=(spatial_pos[nz/2-1,:,0]+spatial_pos[nz/2,:,0])/2.
-        z=(spatial_pos[:,nr/2-1,1]+spatial_pos[:,nr/2,1])/2.
+        nr=len(spatial_pos[0,:,0])
+        nz=len(spatial_pos[:,0,0])
+        if onedim:
+            r=(spatial_pos[int(nz/2)-1,:,0]+spatial_pos[int(nz/2),:,0])/2.
+            z=(spatial_pos[:,int(nr/2)-1,1]+spatial_pos[:,int(nr/2),1])/2.
+        else:
+            r=spatial_pos[:,:,0]
+            z=spatial_pos[:,:,1]
+    elif r_vec is not None and z_vec is not None:
+        nr=len(r_vec)
+        nz=len(z_vec)
+        r=r_vec
+        z=z_vec
     else:
-        r=spatial_pos[:,:,0]
-        z=spatial_pos[:,:,1]
-
-    nr=len(r_vec)
-    nz=len(z_vec)
-    r=r_vec
-    z=z_vec
+        raise ValueError('Either both or neither r_vec and z_vec need to be set.')
 
 
-
-    undulation=np.zeroes(nz,nr,nz,nr)
+    undulation=np.zeros([nz,nr,nz,nr])
 
     for i in range(1, nr-2+1):
         for j in range(1, nz-2+1):
@@ -91,7 +91,7 @@ def undulation_matrix(spatial_pos=None,
             undulation[j,i,j+1,i+1]=(z[j+1]-z[j])  /6.*(1./(r[i]-r[i+1])) + \
                                     (r[i+1]-r[i])  /6.*(1./(z[j]-z[j+1]))
 
-    if (floating is None) :
+    if floating :
         for i in range(0, nr):
             for j in range(0, nz):
 

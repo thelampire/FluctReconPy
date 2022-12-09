@@ -23,13 +23,13 @@ def test_decomp_all(nwin=16,
     nwin=time_win/sampling_time
 
 
-    pos_orig=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2)
-    pos_calc=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2)
-    fwhm_orig=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2)
-    fwhm_calc=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2)
-    density_calc=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin)
-    density_samp=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin)
-    density_orig=np.zeroes(len(noise_vector),len(blob_size),len(spatial_resolution),nwin)
+    pos_orig=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2])
+    pos_calc=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2])
+    fwhm_orig=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2])
+    fwhm_calc=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin,2])
+    density_calc=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin])
+    density_samp=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin])
+    density_orig=np.zeroes([len(noise_vector),len(blob_size),len(spatial_resolution),nwin])
 
     start_time=time.time()
     for i_noise in range(0, len(noise_vector)):
@@ -97,7 +97,7 @@ def test_decomp_all(nwin=16,
                     n_vector_calc_rad=(np.sum(n_vector_calc[:,:,k],1))
                     param3=gaussfit(spat_rad,n_vector_calc_rad, nterms=3)
                     fwhm_calc[i_noise,i_size,i_res,k,0]=param3[2]
-
+#TODO:gaussfit
                     spat_vert=(spatial_pos[:,0,1])
                     n_vector_calc_vert=(np.sum(n_vector_calc[:,:,k],2))
                     param4=gaussfit(spat_vert,n_vector_calc_vert, nterms=3)
@@ -107,5 +107,5 @@ def test_decomp_all(nwin=16,
 
 
 
-
+#TODO:
                 save, pos_orig, pos_calc, fwhm_orig, fwhm_calc, density_orig, density_samp, density_calc, filename="test_decomp_all_save_0-50noise_nores_dens.sav"

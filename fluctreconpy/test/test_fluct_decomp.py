@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 
 from fluctreconpy import calculate_decomposition,reform_matrix,\
                          get_fluct_resp_matrix,get_fluct_resp_matrix,\
-                         fluctuation_matrix_test, get_spatcal
+                         get_spatcal
+from fluctreconpy.test import fluctuation_matrix_test
 
 def test_fluct_decomp(nocalib=True,
-                      k_factor=None,
+                      k_factor=[1e-10,1e3],
                       test=True,
                       iterate=True,
                       floating=True,
@@ -20,7 +21,7 @@ def test_fluct_decomp(nocalib=True,
                       spatial_pos=None,
                       pdf=True,
                       nocalc=False,
-                      save_file=None,
+                      save_filename='tmp/calculate_decomposition_save.pickle',
                       maxiter=100.,
                       moving=None,
                       hole_fluct_amp=0.,
@@ -46,7 +47,8 @@ def test_fluct_decomp(nocalib=True,
     s_vector=np.zeros([n_vert_meas,n_rad_meas])
     n_vector=np.zeros([n_vert_calc,n_rad_calc])
     error_vector=np.zeros([n_vert_meas,n_rad_meas]) #square of the standard error
-    if (moving is not None) :
+
+    if (moving is None) :
         m_matrix=get_fluct_resp_matrix(spatial_pos=spatial_pos, test=test) #[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
         m_matrix_ref = reform_matrix(m_matrix,[n_rad_calc*n_vert_calc,n_rad_meas*n_vert_meas])
         n_vector=fluctuation_matrix_test(spatial_pos=spatial_pos,
@@ -60,7 +62,7 @@ def test_fluct_decomp(nocalib=True,
         blob_density_samp=np.sum(n_vector_ref)/(np.pi*blob_size[0]*blob_size[1])
         s_vector_ref = np.matmul(m_matrix_ref, n_vector_ref) + (np.max(np.abs(np.matmul(m_matrix_ref, n_vector_ref)))*noise_level+electronic_noise)*np.random.rand(64) #s_vector is a simulated measurement)
         error_vector_s_ref=np.abs((np.matmul(m_matrix_ref,n_vector_ref))*noise_level+electronic_noise)**2
-        s_vector=(s_vector_ref, n_vert_meas, n_rad_meas)
+        s_vector=np.reshape(s_vector_ref, (n_vert_meas, n_rad_meas))
         error_vector=np.reshape(error_vector_s_ref,(n_vert_meas, n_rad_meas))
 
         n_vector_calc=calculate_decomposition(light_profile=s_vector,
@@ -74,8 +76,8 @@ def test_fluct_decomp(nocalib=True,
                                               contour=contour,
                                               pdf=pdf,
                                               nocalc=nocalc,
-                                              save_file=save_file,
-                                              n_vector_test=n_vector)
+                                              save_filename=save_filename,
+                                              n_vector=n_vector)
 
     else:
         m_matrix=get_fluct_resp_matrix(spatial_pos=spatial_pos, test=test) #[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
@@ -117,7 +119,7 @@ def test_fluct_decomp(nocalib=True,
                                                          contour=contour,
                                                          pdf=pdf,
                                                          nocalc=nocalc,
-                                                         save_file=save_file,
+                                                         save_filename=save_filename,
                                                          n_vector_test=n_vector[:,:,i])
             if plot:
                 # if i == 0:
@@ -140,7 +142,7 @@ def test_fluct_decomp(nocalib=True,
                 fig,axs=plt.subplots(5,1,figsize=figsize)
 
                 ax=axs[0]
-                plt.contourf((n_vector[:,:,i]).T,
+                ax.contourf((n_vector[:,:,i]).T,
                              r_vec,
                              z_vec,
                              nlevel=51,
@@ -204,5 +206,7 @@ def test_fluct_decomp(nocalib=True,
                 #print, total((n_vector_calc[:,:,i]-n_vector[:,:,i])**2)/n_vert_calc/n_rad_calc
     results={'blob_density_orig':blob_density_orig,
              'blob_density_samp':blob_density_samp,
+             'n_vector_calc':n_vector_calc,
+             'n_vector':n_vector,
         }
     return results

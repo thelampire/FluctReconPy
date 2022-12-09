@@ -8,6 +8,7 @@ Created on Tue Dec  6 01:27:56 2022
 
 import numpy as np
 import pickle
+import copy
 
 from fluctreconpy import undulation_matrix, reform_matrix
 
@@ -29,7 +30,6 @@ def calculate_decomposition(light_profile=None,
                             contour=True,
                             pdf=False,
                             nocalc=False,
-                            save_file=True,
                             save_filename='calculate_decomposition_save.pickle',
                             ):
 
@@ -74,7 +74,7 @@ def calculate_decomposition(light_profile=None,
 
     if not nocalc:
         if iterate:
-            k_factor_vector=k_factor
+            k_factor_vector=copy.deepcopy(k_factor)
             ksi_vector=np.zeros(2)
         else:
             ksi_vector=np.zeros(maxiter)
@@ -97,6 +97,7 @@ def calculate_decomposition(light_profile=None,
         h_matrix_ref = reform_matrix(h_matrix, [n_vert_calc*n_rad_calc, n_vert_meas * n_rad_meas])
 
         ind_iter=1
+        k_factor_curr=k_factor_vector[0]
 
         while True:
 
@@ -104,36 +105,45 @@ def calculate_decomposition(light_profile=None,
             for i in range(n_rad_calc*n_vert_calc-1):
                 m_matrix_prime_ref[:,i]=m_matrix_ref[:,i]/error_profile_s_ref[:]
 
-            p_vector = k_factor * np.linalg.inv(h_matrix_ref.T + k_factor * np.matmul(np.matmul(np.matmul(m_matrix_prime_ref.T, m_matrix_ref), (m_matrix_prime_ref.T), s_vector_ref)))
+            p_vector = k_factor_curr * np.matmul(np.matmul(np.linalg.inv(h_matrix_ref.T +
+                                                                         k_factor_curr * np.matmul(m_matrix_prime_ref.T,
+                                                                                                   m_matrix_ref)),
+                                                           m_matrix_prime_ref.T,),
+                                                 s_vector_ref
+                                                 )
+
 
             #Calculate ksi
-            ksi=n_vert_meas**(-1)*n_rad_meas**(-1)*np.sum((np.squeeze(s_vector_ref) - np.matmul(m_matrix_ref, np.squeeze(p_vector))**2/np.squeeze(error_profile_s_ref)))
+            ksi=n_vert_meas**(-1)*n_rad_meas**(-1)*np.sum((s_vector_ref -
+                                                          np.matmul(m_matrix_ref,p_vector))**2/error_profile_s_ref)
+            #total((reform(s_vector_ref) - m_matrix_ref ** reform(p_vector))^2/reform(error_vector_s_ref))
             if ksi < 0:
                 print('Ksi is lower than 0, iteration is aborted.')
+                print(p_vector)
                 break
 
             if iterate:
                 if ind_iter == 1:
                     ksi_vector[0]=ksi
-                    k_factor=k_factor_vector[1]
+                    k_factor_curr=k_factor_vector[1]
 
                 if ind_iter == 2:
                     ksi_vector[1]=ksi
-                    k_factor=(k_factor_vector[0]+k_factor_vector[1])/2.
+                    k_factor_curr=(k_factor_vector[0]+k_factor_vector[1])/2.
 
                 if ind_iter > 3:
                     if ksi < 1:
                         ksi_vector[1]=ksi
-                        k_factor_vector[1]=k_factor
+                        k_factor_vector[1]=k_factor_curr
                     else:
                         ksi_vector[0]=ksi
-                        k_factor_vector[0]=k_factor
+                        k_factor_vector[0]=k_factor_curr
 
-                k_factor=(k_factor_vector[0]+k_factor_vector[1])/2.
+                k_factor_curr=(k_factor_vector[0]+k_factor_vector[1])/2.
 
             else:
-                k_factor_vector[ind_iter-1]=k_factor
-                k_factor *= increment
+                k_factor_vector[ind_iter-1]=k_factor_curr
+                k_factor_curr *= increment
                 ksi_vector[ind_iter-1]=ksi
 
             ind_iter += 1
@@ -148,10 +158,10 @@ def calculate_decomposition(light_profile=None,
                  'ksi_vector':ksi_vector,
                  'k_factor':k_factor,
                  }
-        with open(save_file,'wb') as f: pickle.dump(results,f)
+        with open(save_filename,'wb') as f: pickle.dump(results,f)
     else:
         try:
-            with open(save_file,'rb') as f: results=pickle.load(f)
+            with open(save_filename,'rb') as f: results=pickle.load(f)
         except Exception as e:
             print('Raised error: '+e)
             raise ValueError('The save file doesnt exist, please run the procedure without /nocalc')

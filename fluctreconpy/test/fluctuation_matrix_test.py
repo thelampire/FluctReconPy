@@ -56,7 +56,7 @@ def fluctuation_matrix_test(fluct_amp=0.05,
     n_rad=len(spatial_pos[0,:,0])
     n_vert=len(spatial_pos[:,0,0])
     levels=np.linspace(hole_fluct_amp, fluct_amp, 51)
-    if (moving is None) :
+    if moving:
         n_time=time_win/sampling_time
         return_matrix=np.zeros([n_vert,n_rad,n_time])
         blob_density=np.zeros(n_time) # Gaussian integral divided by the ellipse defined by the sigma_r, sigma_z of the Gaussian (surface density)
@@ -114,8 +114,5 @@ def fluctuation_matrix_test(fluct_amp=0.05,
                         marker='x',
                         )
 
-    results={'time_vec':time_vec,
-             'return_matrix':return_matrix,
-             }
 
-    return results
+    return return_matrix

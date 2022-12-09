@@ -1,6 +1,6 @@
 import numpy as np
 
-def reform_matrix(matrix, dimensions, reverse=None):
+def reform_matrix(matrix, dimensions, reverse=False):
 
 #**************************************************************
 #*** reform_matrix.pro --< python  by M. Lampert 08.31.2016 ***
@@ -8,13 +8,14 @@ def reform_matrix(matrix, dimensions, reverse=None):
 
 
 
-    if (len(matrix.shape)) != 4 or (len(matrix.shape)) != 2 :
+    if (len(matrix.shape)) != 4 and (len(matrix.shape)) != 2 :
+        print(f"The shape of the matrix is {matrix.shape}")
         raise ValueError('The software cannot be used for matrices other than 4 dimensions converting to 2 dimensions & backwards.')
 
 
     #Caveat: It is only working for matrices which need to be converted from 4D to 2D & backwards
     return_matrix=np.zeros(dimensions)
-    if (reverse is not None) :
+    if not reverse:
 
         n1=len(matrix[:,0,0,0])
         n2=len(matrix[0,:,0,0])
@@ -26,7 +27,8 @@ def reform_matrix(matrix, dimensions, reverse=None):
             print, errormess
             return -1
 
-        if (len(matrix[:,:,0,0]) != dimensions[0]) or (len(matrix[0,0,:,:]) != dimensions[1]):
+        if ((matrix[:,:,0,0].shape[0]*matrix[:,:,0,0].shape[1]) != dimensions[0] or
+            (matrix[0,0,:,:].shape[0]*matrix[0,0,:,:].shape[1]) != dimensions[1]):
             raise ValueError('The dimensions of the matrix must match the numbers in the dimensions vector.')
 
         for i in range(0, n1):

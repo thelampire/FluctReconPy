@@ -3,7 +3,7 @@ import numpy as np
 def get_fluct_resp_matrix(timerange=None, test=True, reform=None, spatial_pos=None):
 
 
-    if (test is None) :
+    if test :
         if spatial_pos is None :
             raise ValueError('The spatial coordinates need to be defined. Returning...')
 
@@ -32,4 +32,5 @@ def get_fluct_resp_matrix(timerange=None, test=True, reform=None, spatial_pos=No
 
         return matrix
     else:
+        raise NotImplementedError('No fluctuation response matrix is available at the moment.')
         pass
