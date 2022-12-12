@@ -9,6 +9,7 @@ Created on Tue Dec  6 01:27:56 2022
 import numpy as np
 import pickle
 import copy
+import matplotlib.pyplot as plt
 
 from fluctreconpy import undulation_matrix, reform_matrix
 
@@ -31,6 +32,8 @@ def calculate_decomposition(light_profile=None,
                             pdf=False,
                             nocalc=False,
                             save_filename='calculate_decomposition_save.pickle',
+
+                            test=False,
                             ):
 
     """
@@ -87,36 +90,47 @@ def calculate_decomposition(light_profile=None,
         n_vert_meas=size_m_mat[2]
         n_rad_meas=size_m_mat[3]
 
-        s_vector_ref=np.reshape((light_profile), n_vert_meas * n_rad_meas)
-        error_profile_s_ref=np.reshape((error_profile), n_vert_meas * n_rad_meas)
+        s_vector_ref=np.reshape(light_profile,
+                                n_vert_meas * n_rad_meas,
+                                )
+        error_profile_s_ref=np.reshape(error_profile,
+                                       n_vert_meas * n_rad_meas,
+                                       )
 
-        m_matrix_ref = reform_matrix(m_matrix, [n_vert_calc * n_rad_calc,n_vert_meas * n_rad_meas])
+        m_matrix_ref = reform_matrix(m_matrix,
+                                     [n_vert_calc * n_rad_calc,n_vert_meas * n_rad_meas])
 
         h_matrix = undulation_matrix(spatial_pos=spatial_pos,
                                      floating=floating) #[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
-        h_matrix_ref = reform_matrix(h_matrix, [n_vert_calc*n_rad_calc, n_vert_meas * n_rad_meas])
+
+        h_matrix_ref = reform_matrix(h_matrix,
+                                     [n_vert_calc*n_rad_calc, n_vert_meas*n_rad_meas])
 
         ind_iter=1
-        k_factor_curr=k_factor_vector[0]
+        k_factor_curr=k_factor[0]
 
         while True:
 
-            m_matrix_prime_ref=m_matrix_ref
+            m_matrix_prime_ref=copy.deepcopy(m_matrix_ref)
             for i in range(n_rad_calc*n_vert_calc-1):
                 m_matrix_prime_ref[:,i]=m_matrix_ref[:,i]/error_profile_s_ref[:]
 
             p_vector = k_factor_curr * np.matmul(np.matmul(np.linalg.inv(h_matrix_ref.T +
                                                                          k_factor_curr * np.matmul(m_matrix_prime_ref.T,
                                                                                                    m_matrix_ref)),
-                                                           m_matrix_prime_ref.T,),
-                                                 s_vector_ref
-                                                 )
-
-
+                                                            m_matrix_prime_ref.T,),
+                                                  s_vector_ref
+                                                  )
             #Calculate ksi
             ksi=n_vert_meas**(-1)*n_rad_meas**(-1)*np.sum((s_vector_ref -
-                                                          np.matmul(m_matrix_ref,p_vector))**2/error_profile_s_ref)
-            #total((reform(s_vector_ref) - m_matrix_ref ** reform(p_vector))^2/reform(error_vector_s_ref))
+                                                          np.matmul(m_matrix_ref,p_vector))**2/error_profile_s_ref[:])
+
+            if test:
+                plt.contourf(np.reshape(p_vector, (n_vert_meas,n_rad_meas)))
+                plt.pause(0.2)
+            #     print(f"p_vector: {p_vector}")
+            #     print(f"ksi: {ksi}")
+                print(k_factor_curr)
             if ksi < 0:
                 print('Ksi is lower than 0, iteration is aborted.')
                 print(p_vector)
@@ -152,7 +166,7 @@ def calculate_decomposition(light_profile=None,
                 break
             if (np.abs(ksi - 1) < threshold):
                 break
-        p_vector = np.reshape(p_vector,(n_rad_calc,n_vert_calc)).T
+        p_vector = np.reshape(p_vector,(n_vert_calc,n_rad_calc))
 
         results={'p_vector':p_vector,
                  'ksi_vector':ksi_vector,
@@ -163,7 +177,7 @@ def calculate_decomposition(light_profile=None,
         try:
             with open(save_filename,'rb') as f: results=pickle.load(f)
         except Exception as e:
-            print('Raised error: '+e)
+            print('Raised exception: '+e)
             raise ValueError('The save file doesnt exist, please run the procedure without /nocalc')
 
     return results

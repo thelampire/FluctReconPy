@@ -24,7 +24,9 @@ def fluctuation_matrix_test(fluct_amp=0.05,
 
                             time_win=1e-3,
                             sampling_time=0.5e-6,
-                            blob_density=1e20):
+                            blob_density=1e20,
+                            test=False,
+                            ):
 
     """
         #************************************************
@@ -56,6 +58,7 @@ def fluctuation_matrix_test(fluct_amp=0.05,
     n_rad=len(spatial_pos[0,:,0])
     n_vert=len(spatial_pos[:,0,0])
     levels=np.linspace(hole_fluct_amp, fluct_amp, 51)
+
     if moving:
         n_time=time_win/sampling_time
         return_matrix=np.zeros([n_vert,n_rad,n_time])
@@ -101,7 +104,6 @@ def fluctuation_matrix_test(fluct_amp=0.05,
         return_matrix=fluct_amp*np.exp(-0.5*(((spatial_pos[:,:,0]-rad_pos)/rad_size)**2+((spatial_pos[:,:,1]-vert_pos)/vert_size)**2))
         blob_density=fluct_amp*2/np.sqrt(rad_size*vert_size)
         levels=np.linspace(0,fluct_amp, 51)
-
         if (plot is None):
             plt.contourf(return_matrix,
                          spatial_pos[:,:,0],

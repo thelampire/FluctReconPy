@@ -3,7 +3,8 @@ import time
 import os
 import pickle
 
-from fluctreconpy import rescale_spat_pos, test_fluct_decomp
+from fluctreconpy import rescale_spat_pos
+from fluctreconpy.test import test_fluct_decomp
 
 def test_decomp_all(nwin=16,
                     stationary=True,
@@ -57,7 +58,7 @@ def test_decomp_all(nwin=16,
                     with open(filename, 'rb') as f: results = pickle.load(f)
                 else:
                     results=test_fluct_decomp(nocalib=True,
-                                              k_factor=k_factor,
+                                              #k_factor=k_factor,
                                               test=test,
                                               iterate=True,
                                               noise_level=noise_vector[i_noise],
