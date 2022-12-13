@@ -1,0 +1,5 @@
+*.pickle
+*.pyc
+test/tmp
+fluctreconpy/__pycache__
+fluctreconpy/tmp/__pycache__

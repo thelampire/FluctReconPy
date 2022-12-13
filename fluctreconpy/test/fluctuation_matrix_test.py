@@ -5,11 +5,12 @@ def fluctuation_matrix_test(fluct_amp=0.05,
                             spatial_pos=None, #TODO: originally this was getcal_kstar_spat(14110)
                             plot=False,
 
-                            moving=False,
                             rad_size=10.,
                             vert_size=10.,
                             rad_pos=2200.,
                             vert_pos=15.,
+
+                            moving=False,
                             vx=100,
                             vy=50,
                             v_size=50.,
@@ -60,7 +61,7 @@ def fluctuation_matrix_test(fluct_amp=0.05,
     levels=np.linspace(hole_fluct_amp, fluct_amp, 51)
 
     if moving:
-        n_time=time_win/sampling_time
+        n_time=int(time_win/sampling_time)
         return_matrix=np.zeros([n_vert,n_rad,n_time])
         blob_density=np.zeros(n_time) # Gaussian integral divided by the ellipse defined by the sigma_r, sigma_z of the Gaussian (surface density)
         time_vec=np.arange(n_time)/n_time*time_win
@@ -116,5 +117,7 @@ def fluctuation_matrix_test(fluct_amp=0.05,
                         marker='x',
                         )
 
+    results={'fluct_matrix':return_matrix,
+             'time_vec':time_vec}
 
-    return return_matrix
+    return results

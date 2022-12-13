@@ -1,1 +1,1 @@
-from .fluctuation_matrix_test import fluctuation_matrix_test
+from .fluctuation_matrix_test import fluctuation_matrix_testfrom .test_fluct_decomp import test_fluct_decomp

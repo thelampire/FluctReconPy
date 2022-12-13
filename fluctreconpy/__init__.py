@@ -8,7 +8,7 @@ from .get_spatcal import get_spatcal
 
 
 from .rescale_spat_pos import rescale_spat_pos
-
+from .FitGaussian import FitGaussian
 
 
 

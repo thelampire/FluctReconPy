@@ -1,11 +1,14 @@
 import numpy as np
+
+from fluctreconpy import get_spatcal
+
 def rescale_spat_pos(shot=14110,
                      nwin=16.,
                      rad_res=10.,
                      vert_res=10,
                      ):
 
-    spatial_pos_init=None #TODO: getcal_kstar_spat(shot)
+    spatial_pos_init=spatial_pos = get_spatcal(shot=14110, device='KSTAR', nbi=123)['spatcal']
     spat_pos_mid=[np.mean(spatial_pos_init[:,:,0]),
                   np.mean(spatial_pos_init[:,:,1])]
     spatial_pos=np.zeros([nwin,nwin,2])
