@@ -116,6 +116,7 @@ def fluctuation_matrix_test(fluct_amp=0.05,
                         color='red',
                         marker='x',
                         )
+        time_vec=None
 
     results={'fluct_matrix':return_matrix,
              'time_vec':time_vec}

@@ -20,7 +20,8 @@ def test_decomp_all(nwin=16,
     n_try=10
     noise_vector=np.arange(n_try)/((n_try*2)) #0-50%
     spatial_resolution=np.asarray([10]) #Only the relative resolution counts
-    blob_size=(np.arange(n_try)+1.)*0.5 #times the spatial resolution
+    #blob_size=(np.arange(n_try)+1.)*0.5 #times the spatial resolution
+    blob_size=[1,2,3]
 
     nwin_time=int(time_win/sampling_time)
 
@@ -63,7 +64,6 @@ def test_decomp_all(nwin=16,
                 if os.path.exists(filename) and nocalc:
                     with open(filename, 'rb') as f: results = pickle.load(f)
                 else:
-                    print('asdf')
                     results=test_fluct_decomp(nocalib=True,
                                               #k_factor=k_factor,
                                               test=test,
@@ -79,10 +79,9 @@ def test_decomp_all(nwin=16,
                                               spatial_pos=spatial_pos,
                                               sampling_time=sampling_time,
                                               )
-                print(results.keys())
-                blob_density_samp=results['density_samp']
-                blob_density_orig=results['density_orig']
-                n_vector_calc=results['density_calc']
+                blob_density_samp=results['blob_density_samp']
+                blob_density_orig=results['blob_density_orig']
+                n_vector_calc=results['n_vector_calc']
                 #n_vector_orig=results['n_vector_orig']
                 time_vec=results['time_vec']
 
@@ -96,17 +95,35 @@ def test_decomp_all(nwin=16,
                     pos_orig[i_noise,i_size,i_res,k,1]=blob_pos[1]+moving['vy'] * time_vec[k]
                     pos_calc[i_noise,i_size,i_res,k,1]=np.sum(n_vector_calc[:,:,k]*spatial_pos[:,:,1])/np.sum(n_vector_calc[:,:,k])
 
+           # spat_rad=reform(spatial_pos[0,*,0])
+           # n_vector_calc_rad=reform(total(n_vector_calc[*,*,k],1))
+           # a=gaussfit(spat_rad,n_vector_calc_rad, param3, nterms=3)
+           # fwhm_calc[i_noise,i_size,i_res,k,0]=param3[2]
+
+           # spat_vert=reform(spatial_pos[*,0,1])
+           # n_vector_calc_vert=reform(total(n_vector_calc[*,*,k],2))
+           # a=gaussfit(spat_vert,n_vector_calc_vert, param4, nterms=3)
+           # fwhm_calc[i_noise,i_size,i_res,k,1]=param4[2]
+           # density_calc[i_noise,i_size,i_res,k]=total(n_vector_calc[*,*,k])/(!pi*param3[2]*param4[2])
+
+
                     fwhm_orig[i_noise,i_size,i_res,k,0]=blob_size[i_size]*spatial_resolution[i_res]
                     fwhm_orig[i_noise,i_size,i_res,k,1]=blob_size[i_size]*spatial_resolution[i_res]
-                    gauss=FitGaussian(x=spatial_pos[:,:,0],
-                                      y=spatial_pos[:,:,1],
-                                      data=n_vector_calc[:,:,k])
-                    size=gauss.size
-                    fwhm_calc[i_noise,i_size,i_res,k,0]=size[0]
+                    # gauss=FitGaussian(x=spatial_pos[:,:,0],
+                    #                   y=spatial_pos[:,:,1],
+                    #                   data=n_vector_calc[:,:,k])
 
-                    fwhm_calc[i_noise,i_size,i_res,k,1]=size[1]
+                    gauss_x=FitGaussian(x=np.mean(spatial_pos[:,:,0],axis=1),
+                                        data=np.mean(n_vector_calc[:,:,k],axis=1))
+                    xsize=gauss_x.size
+                    fwhm_calc[i_noise,i_size,i_res,k,0]=xsize
 
-                    density_calc[i_noise,i_size,i_res,k]=np.sum(n_vector_calc[:,:,k])/(np.pi*size[0]*size[1])
+                    gauss_x=FitGaussian(x=np.mean(spatial_pos[:,:,1],axis=0),
+                                      data=np.mean(n_vector_calc[:,:,k],axis=0))
+                    ysize=gauss_x.size
+                    fwhm_calc[i_noise,i_size,i_res,k,1]=ysize
+
+                    density_calc[i_noise,i_size,i_res,k]=np.sum(n_vector_calc[:,:,k])/(np.pi*xsize*ysize)
 
                 finish_time=time.time()
 
