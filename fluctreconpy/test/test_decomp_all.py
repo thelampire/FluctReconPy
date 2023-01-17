@@ -60,29 +60,30 @@ def test_decomp_all(nwin=16,
 
                 filename='tmp/test_fluct_decomp_N_'+str(noise_vector[i_noise])+'_BS_'+str(blob_size[i_size])+'_R_'+str(spatial_resolution[i_res])+'.pickle'
 
-                # if os.path.exists(filename) and (not nocalc) :
-                #     with open(filename, 'rb') as f: results = pickle.load(f)
-                # else:
-                results=test_fluct_decomp(nocalib=True,
-                                          #k_factor=k_factor,
-                                          test=test,
-                                          iterate=True,
-                                          noise_level=noise_vector[i_noise],
-                                          electronic_noise=electronic_noise,
-                                          blob_size=[blob_size[i_size]*spatial_resolution[i_res],
-                                                     blob_size[i_size]*spatial_resolution[i_res]],
-                                          blob_pos=blob_pos,
-                                          moving=moving,
-                                          plot=plot,
-                                          time_win=time_win,
-                                          spatial_pos=spatial_pos,
-                                          sampling_time=sampling_time,
-                                          )
-
-                blob_density_samp=results['blob_density_samp']
-                blob_density_orig=results['blob_density_orig']
-                n_vector_calc=results['n_vector_calc']
-                n_vector_orig=results['n_vector_orig']
+                if os.path.exists(filename) and nocalc:
+                    with open(filename, 'rb') as f: results = pickle.load(f)
+                else:
+                    print('asdf')
+                    results=test_fluct_decomp(nocalib=True,
+                                              #k_factor=k_factor,
+                                              test=test,
+                                              iterate=True,
+                                              noise_level=noise_vector[i_noise],
+                                              electronic_noise=electronic_noise,
+                                              blob_size=[blob_size[i_size]*spatial_resolution[i_res],
+                                                         blob_size[i_size]*spatial_resolution[i_res]],
+                                              blob_pos=blob_pos,
+                                              moving=moving,
+                                              plot=plot,
+                                              time_win=time_win,
+                                              spatial_pos=spatial_pos,
+                                              sampling_time=sampling_time,
+                                              )
+                print(results.keys())
+                blob_density_samp=results['density_samp']
+                blob_density_orig=results['density_orig']
+                n_vector_calc=results['density_calc']
+                #n_vector_orig=results['n_vector_orig']
                 time_vec=results['time_vec']
 
                 density_samp[i_noise,i_size,i_res,:]=blob_density_samp

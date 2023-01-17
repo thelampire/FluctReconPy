@@ -2,4 +2,7 @@
 *.pyc
 test/tmp
 fluctreconpy/__pycache__
+fluctreconpy/__pycache__/*
 fluctreconpy/tmp/__pycache__
+*/__pycache__
+*/*/__pycache__
