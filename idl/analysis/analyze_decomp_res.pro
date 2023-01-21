@@ -8,6 +8,7 @@ fnum=20.
 default, filename_anal,'test_decomp_all_save_0-50noise'
 restore, filename_anal+".sav"
 !p.font=0
+
 for j=0,n_elements(spatial_resolution)-1 do begin
   for i=imin,n_elements(blob_size)-1 do begin
     y=(abs(fwhm_calc-fwhm_orig)/(fwhm_orig))[*,i,j,*,0]
@@ -24,6 +25,7 @@ for j=0,n_elements(spatial_resolution)-1 do begin
     endelse
   endfor
 endfor
+
 for j=0,n_elements(spatial_resolution)-1 do begin
   for i=imin,n_elements(blob_size)-1 do begin
     y=(abs(fwhm_calc-fwhm_orig)/(fwhm_orig))[*,i,j,*,1]

@@ -11,12 +11,14 @@ import pickle
 import copy
 import matplotlib.pyplot as plt
 
-from fluctreconpy import undulation_matrix, reform_matrix
+from fluctreconpy import undulation_matrix
 
 def calculate_decomposition(light_profile=None,
                             error_profile=None,
-                            spatial_pos=None,
+                            r_vec=None,
+                            z_vec=None,
 
+                            iter_method='bisect',
                             threshold = 0.001,
                             maxiter=100,
                             increment=1.25,
@@ -26,14 +28,12 @@ def calculate_decomposition(light_profile=None,
                             m_matrix=None,
 
                             floating=True,
-                            iterate=True,
                             visual=True,
                             contour=True,
                             pdf=False,
-                            nocalc=False,
-                            save_filename='calculate_decomposition_save.pickle',
 
                             test=False,
+                            transposed=False
                             ):
 
     """
@@ -75,109 +75,115 @@ def calculate_decomposition(light_profile=None,
     ;
     """
 
-    if not nocalc:
-        if iterate:
-            k_factor_vector=copy.deepcopy(k_factor)
-            ksi_vector=np.zeros(2)
-        else:
-            ksi_vector=np.zeros(maxiter)
-            k_factor_vector=np.zeros(maxiter)
-
-        size_m_mat=m_matrix.shape
-
-        n_vert_calc=size_m_mat[0]
-        n_rad_calc=size_m_mat[1]
-        n_vert_meas=size_m_mat[2]
-        n_rad_meas=size_m_mat[3]
-
-        s_vector_ref=np.reshape(light_profile,
-                                n_vert_meas * n_rad_meas,
-                                )
-        error_profile_s_ref=np.reshape(error_profile,
-                                       n_vert_meas * n_rad_meas,
+    s_vector_ref=np.reshape(light_profile,
+                            m_matrix.shape[2] * m_matrix.shape[3],
+                            )
+    error_profile_s_ref=np.reshape(error_profile,
+                                       m_matrix.shape[2] * m_matrix.shape[3]
                                        )
 
-        m_matrix_ref = reform_matrix(m_matrix,
-                                     [n_vert_calc * n_rad_calc,n_vert_meas * n_rad_meas])
+    m_matrix_ref = np.reshape(m_matrix,
+                              (m_matrix.shape[0] * m_matrix.shape[1],
+                               m_matrix.shape[2] * m_matrix.shape[3]),
+                              )
+    h_matrix = undulation_matrix(r_vec=r_vec,
+                                 z_vec=z_vec,
+                                 floating=floating,
+                                 transposed=transposed,
+                                 ) #[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
 
-        h_matrix = undulation_matrix(spatial_pos=spatial_pos,
-                                     floating=floating) #[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
+    h_matrix_ref = np.reshape(h_matrix,
+                              (h_matrix.shape[0]*h_matrix.shape[1],
+                               h_matrix.shape[2]*h_matrix.shape[3]),
+                               )
+    m_matrix_prime_ref=copy.deepcopy(m_matrix_ref)
+    for i in range(m_matrix.shape[0]*m_matrix.shape[1]-1):
+        m_matrix_prime_ref[:,i]=m_matrix_ref[:,i]/error_profile_s_ref[:]
 
-        h_matrix_ref = reform_matrix(h_matrix,
-                                     [n_vert_calc*n_rad_calc, n_vert_meas*n_rad_meas])
 
-        ind_iter=1
-        k_factor_curr=k_factor[0]
+    def function_to_iterate(k_factor_curr,
+                            s_vector_ref, m_matrix_ref, m_matrix_prime_ref,
+                            h_matrix_ref, error_profile_s_ref, m_matrix_shape,
+                            return_p_vector):
 
-        while True:
+        p_vector = k_factor_curr * np.matmul(np.matmul(np.linalg.inv(h_matrix_ref.T +
+                                                                     k_factor_curr * np.matmul(m_matrix_prime_ref.T,
+                                                                                               m_matrix_ref)),
+                                                        m_matrix_prime_ref.T,),
+                                              s_vector_ref
+                                              )
+        if not return_p_vector:
+            return np.sum((s_vector_ref -
+                           np.matmul(m_matrix_ref,p_vector))**2/error_profile_s_ref[:])/m_matrix_shape[2]/m_matrix_shape[3]-1
+        else:
+            return p_vector
 
-            m_matrix_prime_ref=copy.deepcopy(m_matrix_ref)
-            for i in range(n_rad_calc*n_vert_calc-1):
-                m_matrix_prime_ref[:,i]=m_matrix_ref[:,i]/error_profile_s_ref[:]
+    args=(s_vector_ref, m_matrix_ref, m_matrix_prime_ref,
+          h_matrix_ref, error_profile_s_ref, m_matrix.shape,False)
 
-            p_vector = k_factor_curr * np.matmul(np.matmul(np.linalg.inv(h_matrix_ref.T +
-                                                                         k_factor_curr * np.matmul(m_matrix_prime_ref.T,
-                                                                                                   m_matrix_ref)),
-                                                            m_matrix_prime_ref.T,),
-                                                  s_vector_ref
-                                                  )
-            #Calculate ksi
-            ksi=n_vert_meas**(-1)*n_rad_meas**(-1)*np.sum((s_vector_ref -
-                                                          np.matmul(m_matrix_ref,p_vector))**2/error_profile_s_ref[:])
-
-            if test:
-                plt.contourf(np.reshape(p_vector, (n_vert_meas,n_rad_meas)))
-                plt.pause(0.2)
-            #     print(f"p_vector: {p_vector}")
-            #     print(f"ksi: {ksi}")
-                print(k_factor_curr)
-            if ksi < 0:
-                print('Ksi is lower than 0, iteration is aborted.')
-                print(p_vector)
-                break
-
-            if iterate:
-                if ind_iter == 1:
-                    ksi_vector[0]=ksi
-                    k_factor_curr=k_factor_vector[1]
-
-                if ind_iter == 2:
-                    ksi_vector[1]=ksi
-                    k_factor_curr=(k_factor_vector[0]+k_factor_vector[1])/2.
-
-                if ind_iter > 3:
-                    if ksi < 1:
-                        ksi_vector[1]=ksi
-                        k_factor_vector[1]=k_factor_curr
-                    else:
-                        ksi_vector[0]=ksi
-                        k_factor_vector[0]=k_factor_curr
-
-                k_factor_curr=(k_factor_vector[0]+k_factor_vector[1])/2.
-
-            else:
-                k_factor_vector[ind_iter-1]=k_factor_curr
-                k_factor_curr *= increment
-                ksi_vector[ind_iter-1]=ksi
-
-            ind_iter += 1
-
-            if ind_iter == maxiter+1:
-                break
-            if (np.abs(ksi - 1) < threshold):
-                break
-        p_vector = np.reshape(p_vector,(n_vert_calc,n_rad_calc))
-
-        results={'p_vector':p_vector,
-                 'ksi_vector':ksi_vector,
-                 'k_factor':k_factor,
-                 }
-        with open(save_filename,'wb') as f: pickle.dump(results,f)
+    if iter_method == 'scipy_bisect' :                                             #~34s by far the fastest even though it should be the slowest.
+        from scipy.optimize import bisect as root_finder
+    elif iter_method == 'scipy_brenth':                                           #~48s
+        from scipy.optimize import brenth as root_finder
+    elif iter_method == 'scipy_brentq':                                           #~40s
+        from scipy.optimize import brentq as root_finder
+    elif iter_method == 'scipy_ridder':                                           #~70s
+        from scipy.optimize import ridder as root_finder
+    elif iter_method == 'scipy_toms748':                                          #Really slow, not recommended
+        from scipy.optimize import toms748 as root_finder
+    elif iter_method == 'bisect':
+        root_finder=bisect_root_finder
     else:
-        try:
-            with open(save_filename,'rb') as f: results=pickle.load(f)
-        except Exception as e:
-            print('Raised exception: '+e)
-            raise ValueError('The save file doesnt exist, please run the procedure without /nocalc')
+        raise ValueError('iter_method is not in the list of methods: bisect, scipy_[bisect, brenth, brentq, ridder, toms748]')
+    k_factor_opt=root_finder(function_to_iterate, k_factor[0], k_factor[1],
+                             args=args, maxiter=maxiter, xtol=threshold)
 
+    args=(s_vector_ref, m_matrix_ref, m_matrix_prime_ref,
+          h_matrix_ref, error_profile_s_ref, m_matrix.shape, True)
+
+    p_vector=function_to_iterate(k_factor_opt, *args)
+
+
+    results={'p_vector':np.reshape(p_vector,(m_matrix.shape[0],m_matrix.shape[1])),
+             'k_factor':k_factor,
+             'k_factor_opt':k_factor_opt,
+             }
     return results
+
+def bisect_root_finder(function_to_iterate, a, b, args=None, maxiter=1000, xtol=0.001):
+    ind_iter=1
+    k_factor_curr=a
+    while True:
+
+        result=function_to_iterate(k_factor_curr, *args)
+        if result < -1:
+            print('Ksi is lower than 0, iteration is aborted.')
+            break
+
+        k_factor_vector=copy.deepcopy([a,b])
+        result_vector=np.zeros(2)
+        if ind_iter == 1:
+            result_vector[0]=result
+            k_factor_curr=k_factor_vector[1]
+
+        if ind_iter == 2:
+            result_vector[1]=result
+            k_factor_curr=(k_factor_vector[0]+k_factor_vector[1])/2.
+
+        if ind_iter > 3:
+            if result < 0:
+                result_vector[1]=result
+                k_factor_vector[1]=k_factor_curr
+            else:
+                result_vector[0]=result
+                k_factor_vector[0]=k_factor_curr
+
+        k_factor_curr=(k_factor_vector[0]+k_factor_vector[1])/2.
+
+        ind_iter += 1
+
+        if ind_iter == maxiter+1:
+            break
+        if (np.abs(result) < xtol):
+            break
+    return k_factor_curr

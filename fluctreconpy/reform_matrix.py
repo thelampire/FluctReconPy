@@ -1,6 +1,6 @@
 import numpy as np
 
-def reform_matrix(matrix, dimensions, reverse=False):
+def reform_matrix(matrix, dimensions, reverse=False, transposed=False):
 
 #**************************************************************
 #*** reform_matrix.pro --< python  by M. Lampert 08.31.2016 ***
@@ -30,12 +30,18 @@ def reform_matrix(matrix, dimensions, reverse=False):
         if ((matrix[:,:,0,0].shape[0]*matrix[:,:,0,0].shape[1]) != dimensions[0] or
             (matrix[0,0,:,:].shape[0]*matrix[0,0,:,:].shape[1]) != dimensions[1]):
             raise ValueError('The dimensions of the matrix must match the numbers in the dimensions vector.')
-
-        for i in range(0, n1):
+        if transposed:
             for j in range(0, n2):
-                for k in range(0, n3):
+                for i in range(0, n1):
                     for l in range(0, n4):
-                        return_matrix[i*n2+j, k*n4+l]=matrix[i,j,k,l]
+                        for k in range(0, n3):
+                            return_matrix[j*n1+i, l*n3+k]=matrix[i,j,k,l]
+        else:
+            for i in range(0, n1):
+                for j in range(0, n2):
+                    for k in range(0, n3):
+                        for l in range(0, n4):
+                            return_matrix[i*n2+j, k*n4+l]=matrix[i,j,k,l]
 
     else:
         n1=dimensions[0]
@@ -44,17 +50,23 @@ def reform_matrix(matrix, dimensions, reverse=False):
         n4=dimensions[3]
 
         if len(dimensions) != 4:
-            raise ValueError('When reverse reformation is used: the dimensions should be a two element vector.')
+            raise ValueError('When reverse reform is used: the dimensions should be a two element vector.')
 
 
         if (len(matrix[:,0]) != dimensions[0]*dimensions[1]) or (len(matrix[0,:]) != dimensions[2]*dimensions[3]):
             raise ValueError('The dimensions of the matrix must match the numbers in the dimensions vector.')
 
-
-        for i in range(0, n1):
-            for j in range(0, n2):
-                for k in range(0, n3):
-                    for l in range(0, n4):
-                        return_matrix[i,j,k,l]=matrix[i*n2+j, k*n4+l]
+        if transposed:
+            for i in range(0, n1):
+                for j in range(0, n2):
+                    for k in range(0, n3):
+                        for l in range(0, n4):
+                            return_matrix[i,j,k,l]=matrix[i*n2+j, k*n4+l]
+        else:
+            for i in range(0, n1):
+                for j in range(0, n2):
+                    for k in range(0, n3):
+                        for l in range(0, n4):
+                            return_matrix[i,j,k,l]=matrix[j*n1+i, l*n3+k]
 
     return return_matrix

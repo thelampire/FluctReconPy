@@ -24,7 +24,9 @@ import numpy as np
 def get_spatcal(shot=None,
                 device=None,
                 nbi=None,
-                temporary=True):
+                temporary=True,
+                transposed=False,
+                ):
 
     if device == 'KSTAR':
         if temporary == True and shot == 14110 and nbi == 2:
@@ -124,15 +126,26 @@ def get_spatcal(shot=None,
                             0.68007381374871012, 0.67968973816751233, 0.67924449071714688, 0.67884084912422704,
                             0.67619143165643514, 0.67580160931428535, 0.67534999554444963, 0.67494083754574663])
 
+        if transposed:
+            spatcal=np.zeros([16,4,3])
+            spatcal[:,:,0]=np.reshape(R,(4,16)).T
+            spatcal[:,:,1]=np.reshape(z,(4,16)).T
+            spatcal[:,:,2]=np.reshape(phi,(4,16)).T
 
-        spatcal=np.zeros([4,16,3])
-        spatcal[:,:,0]=np.reshape(R,(4,16))
-        spatcal[:,:,1]=np.reshape(z,(4,16))
-        spatcal[:,:,2]=np.reshape(phi,(4,16))
+            results={'R':np.reshape(R,(4,16)).T,
+                     'z':np.reshape(z,(4,16)).T,
+                     'phi':np.reshape(phi,(4,16)).T,
+                     'spatcal':np.flip(spatcal, axis=1)
+                     }
+        else:
+            spatcal=np.zeros([4,16,3])
+            spatcal[:,:,0]=np.reshape(R,(4,16))
+            spatcal[:,:,1]=np.reshape(z,(4,16))
+            spatcal[:,:,2]=np.reshape(phi,(4,16))
 
-        results={'R':np.reshape(R,(4,16)),
-                 'z':np.reshape(z,(4,16)),
-                 'phi':np.reshape(phi,(4,16)),
-                 'spatcal':np.flip(spatcal, axis=1)}
+            results={'R':np.reshape(R,(4,16)),
+                     'z':np.reshape(z,(4,16)),
+                     'phi':np.reshape(phi,(4,16)),
+                     'spatcal':np.flip(spatcal, axis=1)}
 
         return results
