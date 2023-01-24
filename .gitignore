@@ -8,3 +8,4 @@ fluctreconpy/__pycache__/*
 fluctreconpy/tmp/__pycache__
 */__pycache__
 */*/__pycache__
+*.log

@@ -11,8 +11,8 @@ import pickle
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-def analyze_decomp_run(filename='tmp/test_decomp_all_save_0-50noise_nores_dens_all',
-                            pdf=True):
+def analyze_decomp_run(filename='tmp/test_fluct_decomp_all_BS_0.5_5.0_NL_0.0_0.5_SR_10.0_10.0.pickle',
+                       pdf=True):
 
     if pdf:
         pdf_pages=PdfPages(filename+'.pdf')

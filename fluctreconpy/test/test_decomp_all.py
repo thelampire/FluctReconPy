@@ -46,10 +46,12 @@ def test_decomp_all(nwin_x=32,
     density_samp=np.zeros([len(noise_level),len(blob_size),len(spatial_resolution),nwin_time])
     density_orig=np.zeros([len(noise_level),len(blob_size),len(spatial_resolution),nwin_time])
 
-    if not test:
-        filename_all=f'tmp/test_fluct_decomp_all_BS_{blob_size[0]:.1f}_{blob_size[-1]:.1f}_NL_{noise_level[0]:.1f}_{noise_level[-1]:.1f}_SR_{spatial_resolution[0]:.1f}_{spatial_resolution[-1]:.1f}.pickle'
-    else:
-        filename_all='tmp/temp_test_fluct_decomp_all.pickle'
+    filename_all=f'tmp/test_fluct_decomp_all_BS_{blob_size[0]:.1f}_{blob_size[-1]:.1f}_NL_{noise_level[0]:.1f}_{noise_level[-1]:.1f}_SR_{spatial_resolution[0]:.1f}_{spatial_resolution[-1]:.1f}'
+    if test:
+        filename_all+='_test'
+    if not decompose:
+        filename_all+='_nodecomp'
+    filename_all+='.pickle'
 
     n_noise=len(noise_level)
     n_size=len(blob_size)
@@ -78,6 +80,8 @@ def test_decomp_all(nwin_x=32,
                 filename=f'tmp/test_fluct_decomp_N_{noise_level[i_noise]:.1f}_BS_{blob_size[i_size]:.1f}_R_{spatial_resolution[i_res]:.1f}'
                 if test:
                     filename+='_test'
+                if not decompose:
+                    filename+='_nodecomp'
                 filename+='.pickle'
 
 
@@ -123,15 +127,34 @@ def test_decomp_all(nwin_x=32,
                         fwhm_orig[i_noise,i_size,i_res,k,0]=blob_size[i_size]*spatial_resolution[i_res]
                         fwhm_orig[i_noise,i_size,i_res,k,1]=blob_size[i_size]*spatial_resolution[i_res]
 
-                        gauss_x=FitGaussian(x=np.mean(spatial_pos[:,:,0],axis=1),
-                                            data=np.mean(n_vector_calc[:,:,k],axis=1))
-                        xsize=gauss_x.size
-                        fwhm_calc[i_noise,i_size,i_res,k,0]=xsize
+                        # gauss_x=FitGaussian(x=np.mean(spatial_pos[:,:,0],axis=1),
+                        #                     data=np.mean(n_vector_calc[:,:,k],axis=1))
+                        # xsize=gauss_x.size
+                        # fwhm_calc[i_noise,i_size,i_res,k,0]=xsize
 
-                        gauss_y=FitGaussian(x=np.mean(spatial_pos[:,:,1],axis=0),
-                                            data=np.mean(n_vector_calc[:,:,k],axis=0))
-                        ysize=gauss_y.size
-                        fwhm_calc[i_noise,i_size,i_res,k,1]=ysize
+                        # gauss_y=FitGaussian(x=np.mean(spatial_pos[:,:,1],axis=0),
+                        #                     data=np.mean(n_vector_calc[:,:,k],axis=0))
+                        # ysize=gauss_y.size
+                        # fwhm_calc[i_noise,i_size,i_res,k,1]=ysize
+                        try:
+                            y_mean_pos=np.mean(spatial_pos[:,:,1],axis=0)
+                            y_mean_data=np.mean(n_vector_calc[:,:,k],axis=0)
+                            ind_over_half=np.where(y_mean_data > (np.max(y_mean_data)-np.min(y_mean_data))/2)
+
+                            ysize=(np.max(y_mean_pos[ind_over_half])-
+                                   np.min(y_mean_pos[ind_over_half]))
+                            fwhm_calc[i_noise,i_size,i_res,k,1]=ysize
+
+                            x_mean_pos=np.mean(spatial_pos[:,:,1],axis=0)
+                            x_mean_data=np.mean(n_vector_calc[:,:,k],axis=0)
+                            ind_over_half=np.where(x_mean_data > (np.max(x_mean_data)-np.min(x_mean_data))/2)
+                            xsize=(np.max(x_mean_pos[ind_over_half])-
+                                   np.min(x_mean_pos[ind_over_half]))
+                            fwhm_calc[i_noise,i_size,i_res,k,1]=xsize
+                        except Exception as e:
+                            print('Raised exception: '+str(e))
+                            pass
+
 
                         density_calc[i_noise,i_size,i_res,k]=np.sum(n_vector_calc[:,:,k])/(np.pi*xsize*ysize)
 
