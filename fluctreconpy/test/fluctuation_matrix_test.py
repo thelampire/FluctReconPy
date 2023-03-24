@@ -1,21 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def fluctuation_matrix_test(fluct_amp=0.05,
-                            spatial_pos=None, #TODO: originally this was getcal_kstar_spat(14110)
+def fluctuation_matrix_test(spatial_pos=None,
                             plot=False,
 
                             rad_size=10.,
                             vert_size=10.,
                             rad_pos=2200.,
                             vert_pos=15.,
+                            fluct_amp=0.05,
 
                             vx=100,
                             vy=50,
                             v_size=50.,
                             rot_freq=100.,
 
-                            hole_size=10.,
+                            hole_size=None,
+                            hole_rad_size=10.,
+                            hole_vert_size=10.,
                             hole_rad_pos=2200.,
                             hole_vert_pos=15.,
                             hole_fluct_amp=-0.02,
@@ -42,7 +44,7 @@ def fluctuation_matrix_test(fluct_amp=0.05,
         #INPUTs:
         #  shot: shotnumber for spatial calibration
         #  rad_size: radial size of the blob
-        #  vert_size: vertical size of the blog
+        #  vert_size: vertical size of the blob
         #  rad_pos: radial position of the blob
         #  vert_pos: vertical position of the blob
         #  fluct_amp: amplitude of the blob
@@ -51,6 +53,9 @@ def fluctuation_matrix_test(fluct_amp=0.05,
         #  Matrix of the blob with the same coordinates
         #  as the BES measurement.
     """
+    if hole_size is not None:
+        hole_rad_size=hole_size
+        hole_vert_size=hole_size
     levels=np.linspace(hole_fluct_amp, fluct_amp, 51)
 
     n_time=int(time_win/sampling_time)
@@ -73,12 +78,13 @@ def fluctuation_matrix_test(fluct_amp=0.05,
                 b1=-0.5*np.sin(2*arg)/(rad_size+v_size*1e3*t)**2+0.5*np.sin(2*arg)/(vert_size)**2
                 c1=(np.sin(arg)/(rad_size+v_size*1e3*t))**2+(np.cos(arg)/(vert_size))**2
                 return_matrix[j,k,i]=fluct_amp*np.exp(-0.5*(a1*x**2+2*b1*x*y+c1*y**2))
+
                 #hole
                 x=spatial_pos[j,k,0]-(hole_vx*1e3*t+hole_rad_pos)
                 y=spatial_pos[j,k,1]-(hole_vy*1e3*t+hole_vert_pos)
-                a2=(np.cos(arg2)/(hole_size))**2+(np.sin(arg2)/(hole_size))**2
-                b2=-0.5*np.sin(2*arg2)/(hole_size)**2+0.5*np.sin(2*arg2)/(vert_size)**2
-                c2=(np.sin(arg2)/(hole_size+v_size*1e3*t))**2+(np.cos(arg2)/(hole_size))**2
+                a2=(np.cos(arg2)/(hole_rad_size+v_size*1e3*t))**2+(np.sin(arg2)/(hole_vert_size))**2
+                b2=-0.5*np.sin(2*arg2)/(hole_rad_size+v_size*1e3*t)**2+0.5*np.sin(2*arg2)/(hole_vert_size)**2
+                c2=(np.sin(arg2)/(hole_rad_size+v_size*1e3*t))**2+(np.cos(arg2)/(hole_vert_size))**2
                 return_matrix[j,k,i]+=hole_fluct_amp*np.exp(-0.5*(a2*x**2+2*b2*x*y+c2*y**2))
 
                 min_axis=((a1+c1)-np.sqrt((a1+c1)**2 + 4*(b1**2/4 - a1*c1)))/2

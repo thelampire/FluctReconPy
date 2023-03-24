@@ -32,7 +32,7 @@ def test_decomp_all(nwin_x=32,
     if test:
         #blob_size=[1.5,2,2.5]
         blob_size=[2.]
-        noise_level=[0.1]
+        noise_level=[0.33]
         #noise_level=[0.05,0.1,0.15,0.2,0.3]
         nwin_time=5
         time_win=nwin_time*sampling_time

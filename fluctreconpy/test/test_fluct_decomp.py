@@ -10,7 +10,7 @@ from fluctreconpy import calculate_decomposition,reform_matrix,\
 from fluctreconpy.test import fluctuation_matrix_test
 
 def test_fluct_decomp(nocalib=True,
-                      k_factor=[1e-10,1e3],
+                      k_factor=[-1e-10,-1e3],
 
                       floating=True,
                       noise_level=0.01, #relative
@@ -45,7 +45,8 @@ def test_fluct_decomp(nocalib=True,
                       ):
 
     if spatial_pos is None:
-        spatial_pos=rescale_spat_pos(nwin=16,
+        spatial_pos=rescale_spat_pos(nwin_x=16,
+                                     nwin_y=4,
                                      rad_res=10,
                                      vert_res=20,
                                      transposed=transposed)
@@ -115,8 +116,9 @@ def test_fluct_decomp(nocalib=True,
 
             blob_density_samp[i]=np.sum(n_vector_ref)/(np.pi*blob_size[0]*blob_size[1])
 
-            s_vector_ref = np.matmul(m_matrix_ref, n_vector_ref) + noise #s_vector is a simulated measurement
-            error_vector_s_ref=np.abs((np.matmul(m_matrix_ref, n_vector_ref))*noise_level+electronic_noise)**2
+            s_vector_ref = s_ref_no_noise + noise #s_vector is a simulated measurement
+            error_vector_s_ref=np.abs((s_ref_no_noise)*noise_level+electronic_noise)**2
+            #error_vector_s_ref=noise**2
 
             if test:
                 print(f"s_vector_ref: {s_vector_ref}")
@@ -152,8 +154,11 @@ def test_fluct_decomp(nocalib=True,
                                                 )
 
                 n_vector_calc[:,:,i]=results['p_vector']
+                if test:
+                    print(f"k_factor_opt: {results['k_factor_opt']}")
             if test:
                 print(f"n_vector_calc: {n_vector_calc}")
+
         results={'blob_density_orig':blob_density_orig,
                  'blob_density_samp':blob_density_samp,
                  'n_vector_calc':n_vector_calc,
@@ -262,6 +267,7 @@ def plot_test_fluct_decomp(spatial_pos=None,
 
         ax.set_xlabel("R [mm]")
         plt.pause(0.1)
+        plt.tight_layout()
         #print(np.sum((n_vector_calc[:,:,i]-n_vector[:,:,i])**2)/n_vert_calc/n_rad_calc)
     else:
         con=ax.contourf(r_vec,

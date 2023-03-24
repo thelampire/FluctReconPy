@@ -7,9 +7,7 @@ Created on Tue Dec  6 01:27:56 2022
 """
 
 import numpy as np
-import pickle
 import copy
-import matplotlib.pyplot as plt
 
 from fluctreconpy import undulation_matrix
 
@@ -22,7 +20,7 @@ def calculate_decomposition(light_profile=None,
                             threshold = 0.001,
                             maxiter=100,
                             increment=1.25,
-                            k_factor=[1e-10,1e3],
+                            k_factor=[-1e-10,-1e3],
 
                             n_vector=None,
                             m_matrix=None,
@@ -131,7 +129,7 @@ def calculate_decomposition(light_profile=None,
         from scipy.optimize import ridder as root_finder
     elif iter_method == 'scipy_toms748':                                          #Really slow, not recommended
         from scipy.optimize import toms748 as root_finder
-    elif iter_method == 'bisect':
+    elif iter_method == 'bisect':                                                 #~40s
         root_finder=bisect_root_finder
     else:
         raise ValueError('iter_method is not in the list of methods: bisect, scipy_[bisect, brenth, brentq, ridder, toms748]')
