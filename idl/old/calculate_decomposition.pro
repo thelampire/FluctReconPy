@@ -1,7 +1,7 @@
-function calculate_decomposition, light_profile=s_vector, sigma_profile=sigma_vector, m_matrix=m_matrix, $
+function calculate_decomposition, light_profile=s_vector, error_profile=error_vector, m_matrix=m_matrix, $
                                   spatial_pos=spatial_pos, floating=floating, iterate=iterate, k_factor=k_factor, $
                                   visual=visual, contour=contour, ps=ps, nocalc=nocalc, save_file=save_file, $
-                                  n_vector_test=n_vector, ksi=ksi, decompose=decompose
+                                  n_vector_test=n_vector, ksi=ksi
 
 ;*******************************************************
 ;***   calculate_decomposition       by M. Lampert   ***
@@ -41,10 +41,10 @@ function calculate_decomposition, light_profile=s_vector, sigma_profile=sigma_ve
 ;
 
 default, k_factor_first, 1e-10
-default, k_factor_last, 1e6
+default, k_factor_last, 1e3
 default, nocalib, 1.
 default, threshold, 0.001
-default, maxiter, 1000.
+default, maxiter, 100.
 default, iterate, 0
 default, floating, 1
 
@@ -54,15 +54,14 @@ default, save_file, 'calculate_decomposition_save.sav'
 
 if not keyword_set(nocalc) then begin
   if keyword_set(iterate) then begin
-    k_factor_range=[k_factor_first, k_factor_last]
-    ksi_range=dblarr(2)
+    k_factor_vector=[k_factor_first, k_factor_last]
+    ksi_vector=dblarr(2)
     ksi_prev=0.
   endif else begin
-    ksi_range=dblarr(maxiter)
+    ksi_vector=dblarr(maxiter)
+    k_factor_vector=dblarr(maxiter)
   endelse
-  k_factor_vector=dblarr(maxiter)
-  ksi_vector=dblarr(maxiter)
-  
+ 
   size_m_mat=size(m_matrix)
   
   n_vert_calc=double(size_m_mat[1])
@@ -71,60 +70,47 @@ if not keyword_set(nocalc) then begin
   n_rad_meas=double(size_m_mat[4])
  
   s_vector_ref=reform((s_vector),n_vert_meas*n_rad_meas)
-  sigma_vector_s_ref=reform((sigma_vector),n_vert_meas*n_rad_meas)
+  error_vector_s_ref=reform((error_vector),n_vert_meas*n_rad_meas)
   m_matrix_ref = reform_matrix(m_matrix,[n_vert_calc*n_rad_calc,n_vert_meas*n_rad_meas])
   h_matrix=undulation_matrix(spatial_pos=spatial_pos, floating=floating) ;[n_meas_vert*n_meas_rad, n_calc_vert*n_calc_rad]
   h_matrix_ref = reform_matrix(h_matrix, [n_vert_calc*n_rad_calc, n_vert_meas*n_rad_meas])
-  if not decompose then begin
-      p_vector = invert(m_matrix_ref) ## s_vector_ref
-      p_vector= transpose(reform(p_vector,n_rad_calc,n_vert_calc))
-      return, p_vector
-  endif
   iter=1  
-  
-  m_matrix=m_matrix
-  h_matrix_ref=h_matrix_ref
-  
-  
   repeat begin
 
     m_matrix_prime_ref=m_matrix_ref
-    for i=0, n_rad_calc*n_vert_calc-1 do m_matrix_prime_ref[*,i]=m_matrix_ref[*,i]/sigma_vector_s_ref[*]^2
+    for i=0, n_rad_calc*n_vert_calc-1 do m_matrix_prime_ref[*,i]=m_matrix_ref[*,i]/error_vector_s_ref[*]
     
-    p_vector = invert(transpose(h_matrix_ref)/k_factor + transpose(m_matrix_prime_ref) ## m_matrix_ref, status) ## (transpose(m_matrix_prime_ref) ## s_vector_ref)
+    p_vector = k_factor * invert(transpose(h_matrix_ref) + k_factor * transpose(m_matrix_prime_ref) ## m_matrix_ref, status) ## (transpose(m_matrix_prime_ref) ## s_vector_ref)
     
     if status ne 0 then begin
-      print, 'The inversion is invalid. The matrix is singular.'
+      print, 'The inversion is invalid. Matrix is singular.'
     endif
     
     ;Calculate ksi
-    ksi=n_vert_meas^(-1)*n_rad_meas^(-1)*total((reform(s_vector_ref) - m_matrix_ref ## reform(p_vector))^2/reform(sigma_vector_s_ref^2))
+    ksi=n_vert_meas^(-1)*n_rad_meas^(-1)*total((reform(s_vector_ref) - m_matrix_ref ## reform(p_vector))^2/reform(error_vector_s_ref))
     if ksi lt 0 then begin
       print, 'Ksi is lower than 0, iteration is aborted.'
       break
     endif
-    
     if keyword_set(iterate) then begin
       if iter eq 1 then begin
-        ksi_range[0]=ksi
-        k_factor=k_factor_range[1]
+        ksi_vector[0]=ksi
+        k_factor=k_factor_vector[1]
       endif
       if iter eq 2 then begin
-        ksi_range[1]=ksi
-        k_factor=(k_factor_range[0]+k_factor_range[1])/2.
+        ksi_vector[1]=ksi
+        k_factor=(k_factor_vector[0]+k_factor_vector[1])/2.
       endif
       if iter ge 3 then begin
         if ksi lt 1 then begin
-          ksi_range[1]=ksi
-          k_factor_range[1]=k_factor
+          ksi_vector[1]=ksi
+          k_factor_vector[1]=k_factor
         endif else begin
-          ksi_range[0]=ksi
-          k_factor_range[0]=k_factor
+          ksi_vector[0]=ksi
+          k_factor_vector[0]=k_factor
         endelse
-        k_factor=(k_factor_range[0]+k_factor_range[1])/2.
+        k_factor=(k_factor_vector[0]+k_factor_vector[1])/2.
       endif
-      k_factor_vector[iter-1]=k_factor
-      ksi_vector[iter-1]=ksi
     endif else begin
       k_factor_vector[iter-1]=k_factor
       k_factor*=increment
@@ -132,11 +118,7 @@ if not keyword_set(nocalc) then begin
     endelse
     iter+=1
   
-    if iter eq maxiter+1 then begin
-        print, 'Iteration did not converge, breaking the loop...'
-        
-        break
-    endif
+    if iter eq maxiter+1 then break
   endrep until (abs(ksi - 1) lt threshold)
   
   save, /variables, filename=save_file

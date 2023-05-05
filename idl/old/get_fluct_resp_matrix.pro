@@ -1,8 +1,6 @@
-function get_fluct_resp_matrix, timerange=timerange, test=test, reform=reform, spatial_pos=spatial_pos,sensitivity=sensitivity
+function get_fluct_resp_matrix, timerange=timerange, test=test, reform=reform, spatial_pos=spatial_pos
 
 default, test, 1
-default, sensitivity, 1; 1e-19 ;1V/1e19m=3 roughly
-
 if keyword_set(test) then begin
   if not defined(spatial_pos) then begin
     errormess='The spatial coordinates need to be defined. Returning...'
@@ -28,7 +26,7 @@ if keyword_set(test) then begin
   for k=0,nz-1 do begin
     for j=0,nr-1 do begin
       for i=j,nr-1 do begin
-        matrix[k,i,k,j]=sensitivity*1e-9/tauvec[i,k]*exp(-((i-j)*0.01)/(v*tauvec[i,k]))
+        matrix[k,i,k,j]=1e-9/tauvec[i,k]*exp(-((i-j)*0.01)/(v*tauvec[i,k]))
       endfor
     endfor
   endfor

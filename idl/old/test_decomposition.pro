@@ -1,14 +1,12 @@
 pro test_decomposition, n_noise=n_noise, n_error=n_error, test_blob_position=test_blob_position,$
-                        test_blob_size=test_blob_size, test_density=test_density
+                        test_blob_size=test_blob_size
 
 default, n_noise, 100.
-default, n_error, 20.
-
 noise_vec=dindgen(n_noise)/n_noise
 
 if keyword_set(test_density) then begin
 
-
+  default, n_error, 20.
   error_mat=dblarr(n_noise,n_error)
   for i=0,n_noise-1 do begin
     for j=0,n_error-1 do begin

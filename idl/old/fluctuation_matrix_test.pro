@@ -1,7 +1,6 @@
 function fluctuation_matrix_test, rad_size=rad_size, vert_size=vert_size, rad_pos=rad_pos, vert_pos=vert_pos,$
                                   fluct_amp=fluct_amp, spatial_pos=spatial_pos, plot=plot, $
                                   moving=moving, vx=vx, vy=vy, v_size=v_size, rot_freq=rot_freq,$
-                                  
                                   hole_size=hole_size, hole_rad_pos=hole_rad_pos, hole_vert_pos=hole_vert_pos,$ 
                                   hole_fluct_amp=hole_fluct_amp,time_win=time,time_vec=time_vec,$
                                   sampling_time=sampling_time, blob_density=blob_density
@@ -29,7 +28,7 @@ function fluctuation_matrix_test, rad_size=rad_size, vert_size=vert_size, rad_po
   ;  Matrix of the blob with the same coordinates
   ;  as the BES measurement.
                                   
-  default, fluct_amp, 1e19                                  
+                                  
   default, rad_pos, 2200.
   default, vert_pos, 15.
   default, rad_size, 10.
@@ -37,7 +36,8 @@ function fluctuation_matrix_test, rad_size=rad_size, vert_size=vert_size, rad_po
   default, hole_rad_pos, 2200.
   default, hole_vert_pos, 15.
   default, hole_size, 10.
-  default, hole_fluct_amp, -0.02e19
+  default, fluct_amp, 0.05
+  default, hole_fluct_amp, -0.02
   default, spatial_pos, getcal_kstar_spat(14110) 
   default, rot_freq, 100.
   default, vx, 100 ;m/s
@@ -71,21 +71,19 @@ function fluctuation_matrix_test, rad_size=rad_size, vert_size=vert_size, rad_po
           a1=(cos(arg)/(rad_size+v_size*1e3*t))^2+(sin(arg)/(vert_size))^2
           b1=-0.5*sin(2*arg)/(rad_size+v_size*1e3*t)^2+0.5*sin(2*arg)/(vert_size)^2
           c1=(sin(arg)/(rad_size+v_size*1e3*t))^2+(cos(arg)/(vert_size))^2
-          return_matrix[j,k,i]=fluct_amp*exp(-0.5*(a1*x^2 + 2*b1*x*y + c1*y^2))
-          
+          return_matrix[j,k,i]=fluct_amp*exp(-0.5*(a1*x^2+2*b1*x*y+c1*y^2))
           ;hole
           x=spatial_pos[j,k,0]-(hole_vx*1e3*t+hole_rad_pos)
           y=spatial_pos[j,k,1]-(hole_vy*1e3*t+hole_vert_pos)
-          a2=(cos(arg2)/(hole_size+v_size*1e3*t))^2+(sin(arg2)/(hole_size))^2
-          b2=-0.5*sin(2*arg2)/(hole_size+v_size*1e3*t)^2+0.5*sin(2*arg2)/(hole_size)^2
+          a2=(cos(arg2)/(hole_size))^2+(sin(arg2)/(hole_size))^2
+          b2=-0.5*sin(2*arg2)/(hole_size)^2+0.5*sin(2*arg2)/(vert_size)^2
           c2=(sin(arg2)/(hole_size+v_size*1e3*t))^2+(cos(arg2)/(hole_size))^2
-          return_matrix[j,k,i]+=hole_fluct_amp*exp(-0.5*(a2*x^2 + 2*b2*x*y + c2*y^2))
+          return_matrix[j,k,i]+=hole_fluct_amp*exp(-0.5*(a2*x^2+2*b2*x*y+c2*y^2))
         endfor
-      endfor
+     endfor
       min_axis=((a1+c1)-sqrt((a1+c1)^2 + 4*(b1^2/4 - a1*c1)))/2
       maj_axis=((a1+c1)+sqrt((a1+c1)^2 + 4*(b1^2/4 - a1*c1)))/2
-      ;blob_density[i]=fluct_amp*(4*!pi/sqrt(4*a1*c1-b1^2))/(!pi*maj_axis*min_axis)
-      blob_density[i]=fluct_amp*(!pi*maj_axis*min_axis)
+      blob_density[i]=fluct_amp*(4*!pi/sqrt(4*a1*c1-b1^2))/(!pi*maj_axis*min_axis)
       if not i then zrange=[hole_fluct_amp, fluct_amp]
       if keyword_set(plot) then begin
         contour, return_matrix[*,*,i], reform(spatial_pos[*,*,0]),reform(spatial_pos[*,*,1]),nlevel=21, /fill, /irreg, /iso, zrange=zrange
@@ -94,8 +92,7 @@ function fluctuation_matrix_test, rad_size=rad_size, vert_size=vert_size, rad_po
     endfor
   endif else begin
     return_matrix=fluct_amp*exp(-0.5*(((spatial_pos[*,*,0]-rad_pos)/rad_size)^2+((spatial_pos[*,*,1]-vert_pos)/vert_size)^2))
-    ;blob_density=fluct_amp*2/sqrt(rad_size*vert_size)
-    blob_density=fluct_amp*rad_size*vert_size*!pi ;Not actually density, more like number of "particles".
+    blob_density=fluct_amp*2/sqrt(rad_size*vert_size)
     if keyword_set(plot) then begin
       contour, return_matrix, reform(spatial_pos[*,*,0]),reform(spatial_pos[*,*,1]),nlevel=21, /fill, /irreg, /iso
       plots, reform(spatial_pos[*,*,0]),reform(spatial_pos[*,*,1]), psym=4

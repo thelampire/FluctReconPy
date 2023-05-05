@@ -1,27 +1,8 @@
-pro analyze_decomp, filename=filename
+pro analyze_decomp
 
-default, filename, '/Users/mlampert/IDLWorkspace83/test_decomp_all_save_0-50noise_nores_dens.sav'
-
-restore, filename
+restore, '/home/mlampert/IDLWorkspace82/KSTAR_workspace/test_decomp_all_save.sav'
 loadct, 5
 hardon, /color
-fwhm_calc=reform(fwhm_calc)
-fwhm_orig=reform(fwhm_orig)
-n=n_elements(fwhm_calc[0,0,*,0])
-
-for i=0,n_elements(chi2[0,*,0,0])-1 do begin
-    y=total(chi2[*,i,*,*],4)
-    if i eq 0 then begin
-        plot, noise_vector, y, $
-            xtitle='Relative noise amplitude', ytitle='Average density error [1e19m-3]', $
-            yrange=range(total(chi2[*,*,*,*],4)),$
-            charsize=2., thick=2
-        xyouts, 0.8, 0.93, 'Blob size: 10mm', /normal
-    endif else begin
-        oplot, noise_vector, y, color=80+i*20
-        xyouts, 0.8, 0.93-i*0.03, 'Blob size: '+strtrim((i+2)*5,2)+'mm', /normal, color=80+i*20
-    endelse
-endfor
 for i=0,n_elements(fwhm_orig[0,*,0,0])-1 do begin
   if i eq 0 then begin
     plot, noise_vector, total((abs(fwhm_calc-fwhm_orig)/(fwhm_orig))[*,i,*,0],3)/n, $
@@ -48,8 +29,7 @@ for i=0,n_elements(fwhm_orig[0,*,0,1])-1 do begin
     xyouts, 0.8, 0.93-i*0.03, 'Blob size: '+strtrim((i+2)*5,2)+'mm', /normal, color=80+i*20
   endelse
 endfor
-pos_calc=reform(pos_calc)
-pos_orig=reform(pos_orig)
+
 for i=0,n_elements(fwhm_orig[0,*,0,1])-1 do begin
   if i eq 0 then begin
     plot, noise_vector, total((abs(pos_calc-pos_orig)/(pos_orig))[*,i,*,0],3)/n, $
@@ -76,5 +56,5 @@ for i=0,n_elements(fwhm_orig[0,*,0,1])-1 do begin
   endelse
 endfor
 
-hardfile, filename+'.ps'
+hardfile, 'decomp_anal_fit_more_noise.ps'
 end
